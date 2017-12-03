@@ -9,6 +9,24 @@ import (
 	"strconv"
 )
 
+func main() {
+	inputStr := readInput()
+	inputNum := parseInput(inputStr)
+	fmt.Println("The input is", inputNum)
+	myPath := beginPath()
+	foundLargerValue := false
+	for pointNum := 2; pointNum <= inputNum; pointNum++ {
+		myPath.move()
+		if !foundLargerValue && myPath.visitedPoints[myPath.currentPoint] > inputNum {
+			foundLargerValue = true
+			fmt.Println("Part 2: First value larger than input is at point", myPath.currentPoint, "with value",
+				myPath.visitedPoints[myPath.currentPoint])
+		}
+	}
+	fmt.Println("Part 1: Final point is", myPath.currentPoint, ", whose Manhattan distance is",
+		int(math.Abs(float64(myPath.currentPoint.x)))+int(math.Abs(float64(myPath.currentPoint.y))))
+}
+
 type Point struct {
 	x int
 	y int
@@ -34,24 +52,6 @@ type Path struct {
 	currentPoint  Point
 	direction     string
 	visitedPoints map[Point]int // the int value is the points value, i.e. the sum of it and its visited neighbors
-}
-
-func main() {
-	inputStr := readInput()
-	inputNum := parseInput(inputStr)
-	fmt.Println("The input is", inputNum)
-	myPath := beginPath()
-	foundLargerValue := false
-	for pointNum := 2; pointNum <= inputNum; pointNum++ {
-		myPath.move()
-		if !foundLargerValue && myPath.visitedPoints[myPath.currentPoint] > inputNum {
-			foundLargerValue = true
-			fmt.Println("Part 2: First value larger than input is at point", myPath.currentPoint, "with value",
-				myPath.visitedPoints[myPath.currentPoint])
-		}
-	}
-	fmt.Println("Part 1: Final point is", myPath.currentPoint, ", whose Manhattan distance is",
-		int(math.Abs(float64(myPath.currentPoint.x))) + int(math.Abs(float64(myPath.currentPoint.y))))
 }
 
 func (p *Path) addPointToVisited() {
