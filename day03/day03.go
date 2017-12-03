@@ -52,7 +52,7 @@ func (p Point) down() Point {
 type Path struct {
 	currentPoint  Point
 	direction     string
-	visitedPoints map[Point]int // the int value is the points value, i.e. the sum of it and its visited neighbors
+	visitedPoints map[Point]int // the int value is the points value, i.e. the sum of its visited neighbors' points
 }
 
 func (p *Path) addPointToVisited() {
