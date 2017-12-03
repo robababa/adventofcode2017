@@ -1,17 +1,18 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
 	"math"
 	"os"
 	"strconv"
 )
 
 func main() {
-	inputStr := readInput()
-	inputNum := parseInput(inputStr)
+	if len(os.Args) < 2 {
+		fmt.Println("Usage:	day03 <target>")
+		os.Exit(0)
+	}
+	inputNum, _ := strconv.Atoi(os.Args[1])
 	fmt.Println("The input is", inputNum)
 	myPath := beginPath()
 	foundLargerValue := false
@@ -105,18 +106,4 @@ func beginPath() Path {
 	}
 	answer.visitedPoints[Point{x: 0, y: 0}] = 1
 	return answer
-}
-
-func parseInput(s string) int {
-	answer, err := strconv.Atoi(s)
-	if err != nil {
-		log.Panic("Could not convert string", s, "into integer")
-	}
-	return answer
-}
-
-func readInput() string {
-	reader := bufio.NewReader(os.Stdin)
-	inputWithNewline, _ := reader.ReadString('\n')
-	return inputWithNewline[0 : len(inputWithNewline)-1]
 }
