@@ -20,13 +20,11 @@ func reallocate(intArray []int) {
 	currentArrangement := convertToString(myArray)
 	arrangements[currentArrangement] = 1
 	iterations := 0
-	arrangementFound := false
 	for {
 		myArray = reallocateCycle(myArray)
 		currentArrangement = convertToString(myArray)
 		iterations++
-		arrangementFound = arrangements[currentArrangement] != 0
-		if arrangementFound {
+		if arrangements[currentArrangement] != 0 {
 			break
 		}
 		arrangements[currentArrangement] = iterations
