@@ -15,14 +15,13 @@ func main() {
 }
 
 func reallocate(intArray []int) {
-	myArray := intArray
 	arrangements := make(map[string]int)
-	currentArrangement := convertToString(myArray)
+	currentArrangement := convertToString(intArray)
 	arrangements[currentArrangement] = 1
 	iterations := 0
 	for {
-		myArray = reallocateCycle(myArray)
-		currentArrangement = convertToString(myArray)
+		reallocateCycle(intArray)
+		currentArrangement = convertToString(intArray)
 		iterations++
 		if arrangements[currentArrangement] != 0 {
 			break
@@ -33,24 +32,23 @@ func reallocate(intArray []int) {
 	fmt.Println("Part 2: cycle length of repetition:", iterations-arrangements[currentArrangement])
 }
 
-func reallocateCycle(intArray []int) []int {
-	answer := intArray
+func reallocateCycle(intArray []int) {
 	maxBank := 0
 	maxBlocks := 0
-	for i, n := range answer {
+	// identify the memory bank with the most blocks
+	for i, n := range intArray {
 		if n > maxBlocks {
 			maxBlocks = n
 			maxBank = i
 		}
 	}
-	answer[maxBank] = 0
+	intArray[maxBank] = 0
 	// reallocate the blocks
 	for j := 1; maxBlocks > 0; j++ {
-		nextIndex := (maxBank + j) % len(answer)
-		answer[nextIndex]++
+		nextIndex := (maxBank + j) % len(intArray)
+		intArray[nextIndex]++
 		maxBlocks--
 	}
-	return answer
 }
 
 func convertToString(intArray []int) string {
