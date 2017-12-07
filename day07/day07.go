@@ -8,48 +8,58 @@ import (
 	"strings"
 )
 
-type Tree struct {
-	node     string
+type NodeProperties struct {
 	weight   int
-	children []Tree
+	isChild  bool
+	exists   bool
+	children []string
 }
-
-type Forest []Tree
 
 func main() {
-	nodes := make(map[string]int)
-	rawInput := readInput()
-	//fmt.Println(readInput())
-	loadNodes(rawInput, nodes)
+	nodes := make(map[string]*NodeProperties)
+	inputStrings := readInput()
+	//fmt.Println(inputStrings)
+	loadNodes(inputStrings, nodes)
 	//fmt.Println(nodes)
-	forest := loadForest(rawInput, nodes)
-	//fmt.Println(forest)
+	rootNode := findRootNode(nodes)
+	fmt.Println("Part 1: root node is", rootNode)
 }
 
-func loadForest(rawInput []string, nodes map[string]int) Forest {
-	var forest Forest
-	for _, s := range rawInput {
-		fields := strings.Split(s, " ")
-		nodeName := fields[0]
-		tree := Tree{node: nodeName, weight: nodes[nodeName]}
-		// if this node has children, then add them to the tree
-		if len(fields) > 3 {
-			for _, child := range fields[3:] {
-				childName := child[:len(child)-1]
-				tree.children = append(tree.children, Tree{node: childName, weight: nodes[childName]})
-			}
+func findRootNode(nodes map[string]*NodeProperties) string {
+	for k, v := range nodes {
+		if !v.isChild {
+			return k
 		}
-		forest = append(forest, tree)
 	}
-	return forest
+	return ""
 }
 
-func loadNodes(inputStrings []string, nodes map[string]int) {
+func loadNodes(inputStrings []string, nodes map[string]*NodeProperties) {
 	for _, s := range inputStrings {
 		fields := strings.Split(s, " ")
 		nodeName := fields[0]
-		nodeWeight, _ := strconv.Atoi(fields[1][1 : len(fields[1])-1])
-		nodes[nodeName] = nodeWeight
+		nodeWeight, _ := strconv.Atoi(fields[1])
+		var nodeChildren []string
+		if len(fields) > 2 {
+			// we have children!
+			nodeChildren = fields[2:]
+		}
+		if nodes[nodeName] != nil {
+			// this parent node was visited before as a child  Update its weight and its children
+			(nodes[nodeName]).weight = nodeWeight
+			(nodes[nodeName]).children = nodeChildren
+		} else {
+			// we haven't seen this parent node before.  Create it.
+			nodes[nodeName] = &NodeProperties{weight: nodeWeight, isChild: false, exists: true, children: nodeChildren}
+		}
+		// now go through the child nodes, marking existing ones as children, and creating new ones as needed
+		for _, child := range nodeChildren {
+			if nodes[child] != nil {
+				(nodes[child]).isChild = true
+			} else {
+				nodes[child] = &NodeProperties{weight: 0, isChild: true, exists: true, children: []string{}}
+			}
+		}
 	}
 }
 
@@ -57,7 +67,12 @@ func readInput() []string {
 	var answer []string
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
-		answer = append(answer, scanner.Text())
+		txt := scanner.Text()
+		txt = strings.Replace(txt, "-> ", "", -1)
+		txt = strings.Replace(txt, ",", "", -1)
+		txt = strings.Replace(txt, "(", "", -1)
+		txt = strings.Replace(txt, ")", "", -1)
+		answer = append(answer, txt)
 	}
 	return answer
 }
