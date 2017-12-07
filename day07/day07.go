@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -15,17 +16,20 @@ type NodeProperties struct {
 	children []string
 }
 
+var nodes = make(map[string]*NodeProperties)
+
 func main() {
-	nodes := make(map[string]*NodeProperties)
 	inputStrings := readInput()
 	//fmt.Println(inputStrings)
-	loadNodes(inputStrings, nodes)
+	loadNodes(inputStrings)
 	//fmt.Println(nodes)
-	rootNode := findRootNode(nodes)
+	rootNode := findRootNode()
 	fmt.Println("Part 1: root node is", rootNode)
+	fmt.Println("Part 2: unbalanced node information:")
+	weight(rootNode)
 }
 
-func findRootNode(nodes map[string]*NodeProperties) string {
+func findRootNode() string {
 	for k, v := range nodes {
 		if !v.isChild {
 			return k
@@ -34,7 +38,45 @@ func findRootNode(nodes map[string]*NodeProperties) string {
 	return ""
 }
 
-func loadNodes(inputStrings []string, nodes map[string]*NodeProperties) {
+func balanced(weights []int) bool {
+	firstWeight := weights[0]
+	for _, w := range weights {
+		if w != firstWeight {
+			return false
+		}
+	}
+	return true
+}
+
+func weightsOfChildren(baseNode string) []int {
+	var answer []int
+	for _, child := range nodes[baseNode].children {
+		answer = append(answer, nodes[child].weight)
+	}
+	return answer
+}
+
+func weight(baseNode string) int {
+	var singleChildrenWeights []int
+	var totalChildrenWeight int
+	for _, child := range nodes[baseNode].children {
+		childWeight := weight(child)
+		singleChildrenWeights = append(singleChildrenWeights, childWeight)
+		totalChildrenWeight += childWeight
+	}
+	// if there are children, and they aren't balanced, say so
+	if len(singleChildrenWeights) > 0 && !balanced(singleChildrenWeights) {
+		fmt.Println("base node:", baseNode)
+		fmt.Println("child nodes:", nodes[baseNode].children)
+		fmt.Println("child node total weights:", singleChildrenWeights)
+		fmt.Println("child node individual weights:", weightsOfChildren(baseNode))
+		log.Panic("Halting program!")
+	}
+
+	return nodes[baseNode].weight + totalChildrenWeight
+}
+
+func loadNodes(inputStrings []string) {
 	for _, s := range inputStrings {
 		fields := strings.Split(s, " ")
 		nodeName := fields[0]
