@@ -26,10 +26,10 @@ func main() {
 	//fmt.Println(commands)
 	processInstructions(commands)
 	//fmt.Println(registers)
-	findLargest()
+	fmt.Println("Largest value at the end:", findLargest())
 }
 
-func findLargest() {
+func findLargest() int {
 	var largestName string
 	var largestValue int
 	for k, v := range registers {
@@ -41,7 +41,8 @@ func findLargest() {
 			largestValue = v
 		}
 	}
-	fmt.Println("Largest name and value is", largestName, largestValue)
+	//fmt.Println("Largest name and value is", largestName, largestValue)
+	return largestValue
 }
 
 func condition(instruction Command) bool {
@@ -69,9 +70,20 @@ func processInstruction(instruction Command) {
 }
 
 func processInstructions(commands []Command) {
+	started := false
+	largestSoFar := 0
 	for _, instruction := range commands {
 		processInstruction(instruction)
+		if !started {
+			largestSoFar = findLargest()
+			started = true
+		}
+		currentLargest := findLargest()
+		if currentLargest > largestSoFar {
+			largestSoFar = currentLargest
+		}
 	}
+	fmt.Println("Largest value ever:", largestSoFar)
 }
 
 func parseCommand(line string) Command {
