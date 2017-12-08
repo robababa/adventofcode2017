@@ -26,7 +26,7 @@ func main() {
 	//fmt.Println(commands)
 	processInstructions(commands)
 	//fmt.Println(registers)
-	fmt.Println("Largest value at the end:", findLargest())
+	fmt.Println("Part 1: Largest value at the end:", findLargest())
 }
 
 func findLargest() int {
@@ -83,7 +83,7 @@ func processInstructions(commands []Command) {
 			largestSoFar = currentLargest
 		}
 	}
-	fmt.Println("Largest value ever:", largestSoFar)
+	fmt.Println("Part 2: Largest value ever:", largestSoFar)
 }
 
 func parseCommand(line string) Command {
