@@ -17,13 +17,14 @@ func main() {
 	cancelChan := make(chan byte)
 	garbageChan := make(chan byte)
 	groupCountChan := make(chan byte)
-	finalAnswerChan := make(chan int)
+	Part1AnswerChan := make(chan int)
+	Part2AnswerChan := make(chan int)
 	go readInput(cancelChan)
 	go applyCancel(cancelChan, garbageChan)
-	go removeGarbage(garbageChan, groupCountChan)
-	go countGroups(groupCountChan, finalAnswerChan)
-	finalCount := <-finalAnswerChan
-	fmt.Println("Part 1: Total group count:", finalCount)
+	go removeGarbage(garbageChan, groupCountChan, Part2AnswerChan)
+	go countGroups(groupCountChan, Part1AnswerChan)
+	fmt.Println("Part 1: Total group count:", <-Part1AnswerChan)
+	fmt.Println("Part 2: Total garbage count:", <-Part2AnswerChan)
 }
 
 func countGroups(inputChan <-chan byte, outputChan chan <-int) {
@@ -32,39 +33,46 @@ func countGroups(inputChan <-chan byte, outputChan chan <-int) {
 	for {
 		b := <-inputChan
 		if b == zeroByte {
+			outputChan <- groupCount
 			break
 		} else if b == startGroup {
 			groupsNested++
 		} else if b == endGroup {
 			groupCount += groupsNested
+			groupsNested--
 		} else {
 			continue
 		}
 	}
-	outputChan <- groupCount
-	fmt.Println("countGroups() finished")
+	close(outputChan)
+	//fmt.Println("countGroups() finished")
 }
 
 
-func removeGarbage(inputChan <-chan byte, outputChan chan <-byte) {
+func removeGarbage(inputChan <-chan byte, outputChan chan <-byte, part2AnswerChan chan <-int) {
 	insideGarbage := false
+	garbageCharCount := 0
 	for {
 		b := <-inputChan
 		if b == zeroByte {
+			outputChan <- b
 			break
-		} else if b == startGarbage {
+		} else if b == startGarbage && !insideGarbage {
 			insideGarbage = true
 			continue
 		} else if b == endGarbage {
 			insideGarbage = false
 			continue
 		} else if insideGarbage {
+			garbageCharCount++
 			continue
 		} else {
 			outputChan <- b
 		}
 	}
-	fmt.Println("removeGarbage() finished")
+	part2AnswerChan <- garbageCharCount
+	close(outputChan)
+	//fmt.Println("removeGarbage() finished")
 }
 
 func applyCancel(inputChan <-chan byte, outputChan chan <-byte) {
@@ -72,6 +80,8 @@ func applyCancel(inputChan <-chan byte, outputChan chan <-byte) {
 	for {
 		b := <-inputChan
 		if b == zeroByte {
+			outputChan <- b
+			close(outputChan)
 			break
 		} else if doingCancel {
 			doingCancel = false
@@ -82,7 +92,7 @@ func applyCancel(inputChan <-chan byte, outputChan chan <-byte) {
 			outputChan <- b
 		}
 	}
-	fmt.Println("applyCancel() finished")
+	//fmt.Println("applyCancel() finished")
 }
 
 func readInput(nextChan chan <-byte) {
@@ -97,5 +107,5 @@ func readInput(nextChan chan <-byte) {
 			nextChan <- b
 		}
 	}
-	fmt.Println("readInput() finished")
+	//fmt.Println("readInput() finished")
 }
