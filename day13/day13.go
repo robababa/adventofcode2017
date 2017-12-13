@@ -12,27 +12,31 @@ var firewall = make(map[int]int)
 
 func main() {
 	parseInput(readInput())
-	part1Severity, _ := runThroughFirewall(0)
+	part1Severity, _ := runThroughFirewall(0, false)
 	fmt.Println("Part 1: Severity is", part1Severity)
 	fmt.Println("Part 2: Smallest perfect delay is", smallestPerfectDelay())
 }
 
 func smallestPerfectDelay() int {
 	for i :=0; ; i++ {
-		if _, caught := runThroughFirewall(i); !caught {
+		if _, caught := runThroughFirewall(i, true); !caught {
 			return i
 		}
 	}
 }
 
-func runThroughFirewall(delay int) (int, bool) {
+func runThroughFirewall(delay int, quitEarly bool) (int, bool) {
 	severity := 0
 	caught := false
 	for k, v := range firewall {
 		cycle := 2 * (v - 1)
 		if (delay + k) % cycle == 0 {
-			caught = true
-			severity += k * v
+			if quitEarly {
+				return 0, true
+			} else {
+				caught = true
+				severity += k * v
+			}
 		}
 	}
 	return severity, caught
