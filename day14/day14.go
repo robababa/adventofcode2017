@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"encoding/hex"
 	"strconv"
+	"strings"
 )
 
 const ListSize = 256
@@ -28,7 +29,16 @@ func main() {
 		myDenseHash := denseHash(intArray)
 		//fmt.Println("Part 2: dense hash is:", part2DenseHash)
 		fmt.Println(denseHashToHexString(myDenseHash))
+		fmt.Println("Number of ones:", countOnes(myDenseHash))
 	}
+}
+
+func countOnes(input [16]int) int {
+	answer := 0
+	for _, n := range input {
+		answer += len(strings.Replace(strconv.FormatInt(n, 2), "0", "", -1))
+	}
+	return answer
 }
 
 func denseHashToHexString(input [16]int) string {
