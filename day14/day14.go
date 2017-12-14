@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"fmt"
-	"encoding/hex"
 	"strconv"
 	"strings"
 )
@@ -17,6 +16,7 @@ var startAt int
 
 func main() {
 	input := os.Args[1]
+	numberOfOnes := 0
 	for j := 0; j < GridHeight; j++ {
 		skip = 0
 		startAt = 0
@@ -25,28 +25,19 @@ func main() {
 		for i := 0; i < Rounds; i++ {
 			intArray = applyTwists(intArray, hashInput)
 		}
-		//fmt.Println("Part 2: sparse hash is:", arrPart2)
 		myDenseHash := denseHash(intArray)
-		//fmt.Println("Part 2: dense hash is:", part2DenseHash)
-		fmt.Println(denseHashToHexString(myDenseHash))
-		fmt.Println("Number of ones:", countOnes(myDenseHash))
+		//fmt.Println("Number of ones:", countOnes(myDenseHash))
+		numberOfOnes += countOnes(myDenseHash)
 	}
+	fmt.Println("Part 1: Number of ones:", numberOfOnes)
 }
 
 func countOnes(input [16]int) int {
 	answer := 0
 	for _, n := range input {
-		answer += len(strings.Replace(strconv.FormatInt(n, 2), "0", "", -1))
+		answer += len(strings.Replace(strconv.FormatInt(int64(n), 2), "0", "", -1))
 	}
 	return answer
-}
-
-func denseHashToHexString(input [16]int) string {
-	var bytes []byte
-	for i := 0; i<16; i++ {
-		bytes = append(bytes, byte(input[i]))
-	}
-	return hex.EncodeToString(bytes)
 }
 
 func denseHash(input [ListSize]int) [16]int {
