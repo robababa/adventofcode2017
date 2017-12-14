@@ -17,6 +17,7 @@ var startAt int
 func main() {
 	input := os.Args[1]
 	numberOfOnes := 0
+	var stringArray []string
 	for j := 0; j < GridHeight; j++ {
 		skip = 0
 		startAt = 0
@@ -28,8 +29,93 @@ func main() {
 		myDenseHash := denseHash(intArray)
 		//fmt.Println("Number of ones:", countOnes(myDenseHash))
 		numberOfOnes += countOnes(myDenseHash)
+		stringArray = append(stringArray, toBinaryString(myDenseHash))
 	}
-	fmt.Println("Part 1: Number of ones:", numberOfOnes)
+	fmt.Println("Part 1: Number of ones is", numberOfOnes)
+	regionGrid := createRegionGrid(stringArray)
+	//fmt.Println("Part 2: Grid")
+	//fmt.Println(regionGrid)
+	consolidateRegions(&regionGrid)
+	//fmt.Println(regionGrid)
+	fmt.Println("Part 2: Number of regions is", countRegions(&regionGrid))
+}
+
+func countRegions(regionGrid *[128][128]int) int {
+	m := make(map[int]bool)
+	for i := 0; i < 128; i++ {
+		for j := 0; j < 128; j++ {
+			val := regionGrid[i][j]
+			if val != 0 {
+				m[val] = true
+			}
+		}
+	}
+	return len(m)
+}
+
+func consolidateRegions(regionGrid *[128][128]int) {
+	updatedGrid := true
+	for updatedGrid {
+		updatedGrid = false
+		for i := 0; i < 128; i++ {
+			for j := 0; j < 128; j++ {
+				here := regionGrid[i][j]
+				if here == 0 {
+					continue
+				}
+				var above, below, left, right int
+				if i > 0 {
+					above = regionGrid[i-1][j]
+				}
+				if j > 0 {
+					left = regionGrid[i][j-1]
+				}
+				if i < 127 {
+					below = regionGrid[i+1][j]
+				}
+				if j < 127 {
+					right = regionGrid[i][j+1]
+				}
+				if above != 0 && above < here {
+					regionGrid[i][j] = above
+					updatedGrid = true
+				} else if left != 0 && left < here {
+					regionGrid[i][j] = left
+					updatedGrid = true
+				} else if right != 0 && right < here {
+				regionGrid[i][j] = right
+				updatedGrid = true
+				} else if below != 0 && below < here {
+				regionGrid[i][j] = below
+				updatedGrid = true
+				}
+			}
+		}
+	}
+}
+
+func createRegionGrid(stringArray []string) [128][128]int {
+	var answer [128][128]int
+	regionNumber := 1
+	for i, s := range stringArray {
+		for j, c := range s {
+			if c == '1' {
+				answer[i][j] = regionNumber
+				regionNumber++
+			}
+		}
+	}
+	return answer
+}
+
+func toBinaryString(input [16]int) string {
+	var answer string
+	for _, n := range input {
+		s := strconv.FormatInt(int64(n), 2)
+		// we need to prefix the string with zeros to make it 8 places long
+		answer += strings.Repeat("0", 8 - len(s)) + s
+	}
+	return answer
 }
 
 func countOnes(input [16]int) int {
@@ -39,6 +125,8 @@ func countOnes(input [16]int) int {
 	}
 	return answer
 }
+
+// everything below here was copy/pasted from day 10
 
 func denseHash(input [ListSize]int) [16]int {
 	var answer [16]int
