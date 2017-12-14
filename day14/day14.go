@@ -38,6 +38,18 @@ func main() {
 	consolidateRegions(&regionGrid)
 	//fmt.Println(regionGrid)
 	fmt.Println("Part 2: Number of regions is", countRegions(&regionGrid))
+	printRegions(&regionGrid)
+}
+
+func printRegions(regionGrid *[128][128]int) {
+	for i := 0; i < 128; i++ {
+		for j := 0; j < 128; j++ {
+			val := strconv.Itoa(regionGrid[i][j])
+			prefix := strings.Repeat(" ", 4 - len(val))
+			fmt.Print(prefix + val + " ")
+		}
+		fmt.Println()
+	}
 }
 
 func countRegions(regionGrid *[128][128]int) int {
