@@ -10,7 +10,7 @@ const FactorB = 48271
 const Modulus = 2147483647
 const Part1Rounds = 40000000
 const Part2Rounds = 5000000
-const compareModulus = 65536
+const CompareModulus = 65536
 
 func main() {
 	part1()
@@ -25,7 +25,7 @@ func part2() {
 		numA = generateNextA(numA, true)
 		numB = generateNextB(numB, true)
 		//fmt.Println("A is", numA, "and B is", numB)
-		if (numA - numB) % compareModulus == 0 {
+		if (numA - numB) %CompareModulus == 0 {
 			//fmt.Println("A and B are similar at the end")
 			similarCount++
 		}
@@ -42,7 +42,7 @@ func part1() {
 		numA = generateNextA(numA, false)
 		numB = generateNextB(numB, false )
 		//fmt.Println("A is", numA, "and B is", numB)
-		if (numA - numB) % compareModulus == 0 {
+		if (numA - numB) %CompareModulus == 0 {
 			//fmt.Println("A and B are similar at the end")
 			similarCount++
 		}
