@@ -24,7 +24,14 @@ func init() {
 
 func main() {
 	//print()
-	for _, instruction := range readInput() {
+	instructions := readInput()
+	part1(instructions)
+	fmt.Println("Part 1 answer:")
+	print()
+}
+
+func part1(instructions []string) {
+	for _, instruction := range instructions {
 		operation := instruction[0]
 		operands := instruction[1:]
 		switch operation {
@@ -45,8 +52,6 @@ func main() {
 		}
 		}
 	}
-	fmt.Println("Part 1 answer:")
-	print()
 }
 
 func print() {
