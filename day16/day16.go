@@ -34,6 +34,7 @@ func main() {
 	print()
 	buildRound0(danceResults())
 	fmt.Println(dances)
+	buildFutureRounds()
 	//buildDances()
 }
 
@@ -48,14 +49,21 @@ func buildRound0(danceResults string) {
 	}
 }
 
-//func buildDances() {
-//	d := Dances
-//	for d > 0 {
-//		dances = append(dances, make(map[string]string))
-//		d /= 2
-//	}
-//	fmt.Println("Part 2 dances length is", len(dances))
-//}
+func buildFutureRounds() {
+	d := Dances
+	for d > 0 {
+		previousRound := len(dances) - 1
+		dances = append(dances, make(map[string]string))
+		currentRound := previousRound + 1
+		for _, b := range Letters {
+			c := string(b)
+			dances[currentRound][c] = dances[previousRound][dances[previousRound][c]]
+		}
+		d /= 2
+	}
+	fmt.Println("After building future rounds, dances are:")
+	fmt.Println(dances)
+}
 
 func part1(instructions []string) {
 	for _, instruction := range instructions {
