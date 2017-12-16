@@ -1,8 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"bufio"
+	"os"
+	"strconv"
+	"strings"
+)
 
-const Letters = "abcde"
+const Letters = "abcdefghijklmnop"
 const LetterCount = len(Letters)
 
 var firstPosition = 0
@@ -17,12 +23,29 @@ func init() {
 }
 
 func main() {
-	print()
-	spin(1)
-	print()
-	exchange(3, 4)
-	print()
-	swap("e", "b")
+	//print()
+	for _, instruction := range readInput() {
+		operation := instruction[0]
+		operands := instruction[1:]
+		switch operation {
+		case 's': {
+			spinSize, _ := strconv.Atoi(operands)
+			spin(spinSize)
+		}
+		case 'x': {
+			positions := strings.Split(operands, "/")
+			position1, _ := strconv.Atoi(positions[0])
+			position2, _ := strconv.Atoi(positions[1])
+			exchange(position1, position2)
+
+		}
+		case 'p': {
+			partners := strings.Split(operands, "/")
+			partner(partners[0], partners[1])
+		}
+		}
+	}
+	fmt.Println("Part 1 answer:")
 	print()
 }
 
@@ -45,8 +68,18 @@ func exchange(position1 int, position2 int) {
 	letterMap[positionMap[actual2]] = actual2
 }
 
-func swap(letter1 string, letter2 string) {
+func partner(letter1 string, letter2 string) {
 	letterMap[letter1], letterMap[letter2] = letterMap[letter2], letterMap[letter1]
 	positionMap[letterMap[letter1]] = letter1
 	positionMap[letterMap[letter2]] = letter2
+}
+
+func readInput() []string {
+	var answer []string
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Split(bufio.ScanWords)
+	for scanner.Scan() {
+	answer = append(answer, scanner.Text())
+	}
+	return answer
 }
