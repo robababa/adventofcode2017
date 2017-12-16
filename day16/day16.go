@@ -10,10 +10,14 @@ import (
 
 const Letters = "abcdefghijklmnop"
 const LetterCount = len(Letters)
+const Dances = 1000000000
 
 var firstPosition = 0
 var letterMap = make(map[string]int)
 var positionMap = make(map[int]string)
+
+// each array slot i is the result of doing 2^i dances
+var dances []map[string]string
 
 func init() {
 	for i, c := range Letters {
@@ -28,7 +32,30 @@ func main() {
 	part1(instructions)
 	fmt.Println("Part 1 answer:")
 	print()
+	buildRound0(danceResults())
+	fmt.Println(dances)
+	//buildDances()
 }
+
+func buildRound0(danceResults string) {
+	//fmt.Println("danceResults is", danceResults)
+	dances = append(dances, make(map[string]string))
+	for _, b := range Letters {
+		c := string(b)
+		// after 2^0 = 1 rounds of dance, this character maps to this other character
+		//fmt.Println("character", c, "is in danceResults in position", strings.IndexAny(danceResults, c))
+		dances[0][c] = string(Letters[strings.IndexAny(danceResults, c)])
+	}
+}
+
+//func buildDances() {
+//	d := Dances
+//	for d > 0 {
+//		dances = append(dances, make(map[string]string))
+//		d /= 2
+//	}
+//	fmt.Println("Part 2 dances length is", len(dances))
+//}
 
 func part1(instructions []string) {
 	for _, instruction := range instructions {
@@ -54,11 +81,16 @@ func part1(instructions []string) {
 	}
 }
 
-func print() {
+func danceResults() string {
+	var answer string
 	for i := 0; i < LetterCount; i++ {
-		fmt.Print(positionMap[(i + firstPosition) % LetterCount])
+		answer += positionMap[(i + firstPosition) % LetterCount]
 	}
-	fmt.Println()
+	return answer
+}
+
+func print() {
+	fmt.Println(danceResults())
 }
 
 func spin(spinSize int) {
