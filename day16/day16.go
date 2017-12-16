@@ -35,9 +35,10 @@ func main() {
 	buildRound0(danceResults())
 	fmt.Println(dances)
 	buildFutureRounds()
-	//buildDances()
+	fmt.Println(len(dances))
 }
 
+// Round 0 is really just one round of dancing, i.e. what happens in part 1
 func buildRound0(danceResults string) {
 	//fmt.Println("danceResults is", danceResults)
 	dances = append(dances, make(map[string]string))
@@ -49,6 +50,8 @@ func buildRound0(danceResults string) {
 	}
 }
 
+// Each future round N is actually the result of 2^N dances, so round "1" is after 2 rounds,
+// round "2" is after 2^2 = 4 rounds, and so on
 func buildFutureRounds() {
 	d := Dances
 	for d > 0 {
