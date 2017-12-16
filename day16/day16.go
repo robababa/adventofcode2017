@@ -101,13 +101,7 @@ func partner(letter1 string, letter2 string) {
 }
 
 func readInput() []string {
-	//var answer []string
 	reader := csv.NewReader(os.Stdin)
 	answer, _ := reader.Read()
-	//scanner := bufio.NewScanner(os.Stdin)
-	//scanner.Split(bufio.ScanWords)
-	//for scanner.Scan() {
-	//answer = append(answer, scanner.Text())
-	//}
 	return answer
 }
