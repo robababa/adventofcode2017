@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"math"
 )
 
 const Letters = "abcdefghijklmnop"
@@ -17,9 +16,6 @@ var firstPosition = 0
 var letterMap = make(map[string]int)
 var positionMap = make(map[int]string)
 
-// each array slot i is the result of doing 2^i dances
-var dances []map[string]string
-
 func init() {
 	for i, c := range Letters {
 		letterMap[string(c)] = i
@@ -28,74 +24,26 @@ func init() {
 }
 
 func main() {
-	//print()
+	printResults()
 	instructions := readInput()
 	part1(instructions)
 	fmt.Println("Part 1 answer:")
-	print()
-	buildRound0(danceResults())
-	//fmt.Println(dances)
-	buildFutureRounds()
-	part2()
-}
+	printResults()
 
-func applyRound(answer map[string]string, roundNumber int) {
-	for k, v := range answer {
-		answer[k] = dances[roundNumber][v]
-	}
-}
-
-func part2() {
-	roundsLeft := Dances
-	answer := make(map[string]string)
-	for _, b := range Letters {
-		c := string(b)
-		answer[c] = c
-	}
-	for roundsLeft > 0 {
-		roundToApply := int(math.Log2(float64(roundsLeft)))
-		fmt.Println("Applying round", roundToApply)
-		applyRound(answer, roundToApply)
-		roundsLeft -= int(math.Exp2(float64(roundToApply)))
-	}
-	// abcenfghijklmdop is wrong
-	// gkmdeaholjbfcnpi is wrong
-	fmt.Println("Part 2 answer is:")
-	for _, b := range Letters {
-		c := string(b)
-		fmt.Print(answer[c])
-	}
-	fmt.Println()
-}
-
-// Round 0 is really just one round of dancing, i.e. what happens in part 1
-func buildRound0(danceResults string) {
-	//fmt.Println("danceResults is", danceResults)
-	dances = append(dances, make(map[string]string))
-	for _, b := range Letters {
-		c := string(b)
-		// after 2^0 = 1 rounds of dance, this character maps to this other character
-		fmt.Println("character", c, "is in danceResults in position", strings.IndexAny(danceResults, c))
-		dances[0][c] = string(Letters[strings.IndexAny(danceResults, c)])
-	}
-}
-
-// Each future round N is actually the result of 2^N dances, so round "1" is after 2 rounds,
-// round "2" is after 2^2 = 4 rounds, and so on
-func buildFutureRounds() {
-	d := Dances
-	for d > 0 {
-		previousRound := len(dances) - 1
-		dances = append(dances, make(map[string]string))
-		currentRound := previousRound + 1
-		for _, b := range Letters {
-			c := string(b)
-			dances[currentRound][c] = dances[previousRound][dances[previousRound][c]]
+	cyclesAt := 0
+	for i := 2;; i++ {
+		part1(instructions)
+		if danceResults() == Letters {
+			fmt.Println("It's a cycle at iteration", i)
+			cyclesAt = i
+			break
 		}
-		d /= 2
 	}
-	fmt.Println("After building future rounds, dances are:")
-	//fmt.Println(dances)
+	for j := 1; j <= Dances % cyclesAt; j++ {
+		part1(instructions)
+	}
+	fmt.Println("Part 2 answer:")
+	printResults()
 }
 
 func part1(instructions []string) {
@@ -130,7 +78,7 @@ func danceResults() string {
 	return answer
 }
 
-func print() {
+func printResults() {
 	fmt.Println(danceResults())
 }
 
