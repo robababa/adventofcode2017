@@ -46,7 +46,7 @@ func applyRound(answer map[string]string, roundNumber int) {
 }
 
 func part2() {
-	roundsLeft := Dances - 1
+	roundsLeft := Dances
 	answer := make(map[string]string)
 	for _, b := range Letters {
 		c := string(b)
@@ -75,7 +75,7 @@ func buildRound0(danceResults string) {
 	for _, b := range Letters {
 		c := string(b)
 		// after 2^0 = 1 rounds of dance, this character maps to this other character
-		//fmt.Println("character", c, "is in danceResults in position", strings.IndexAny(danceResults, c))
+		fmt.Println("character", c, "is in danceResults in position", strings.IndexAny(danceResults, c))
 		dances[0][c] = string(Letters[strings.IndexAny(danceResults, c)])
 	}
 }
