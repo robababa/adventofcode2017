@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"math"
 )
 
 const Letters = "abcdefghijklmnop"
@@ -33,9 +34,38 @@ func main() {
 	fmt.Println("Part 1 answer:")
 	print()
 	buildRound0(danceResults())
-	fmt.Println(dances)
+	//fmt.Println(dances)
 	buildFutureRounds()
-	fmt.Println(len(dances))
+	part2()
+}
+
+func applyRound(answer map[string]string, roundNumber int) {
+	for k, v := range answer {
+		answer[k] = dances[roundNumber][v]
+	}
+}
+
+func part2() {
+	roundsLeft := Dances - 1
+	answer := make(map[string]string)
+	for _, b := range Letters {
+		c := string(b)
+		answer[c] = c
+	}
+	for roundsLeft > 0 {
+		roundToApply := int(math.Log2(float64(roundsLeft)))
+		fmt.Println("Applying round", roundToApply)
+		applyRound(answer, roundToApply)
+		roundsLeft -= int(math.Exp2(float64(roundToApply)))
+	}
+	// abcenfghijklmdop is wrong
+	// gkmdeaholjbfcnpi is wrong
+	fmt.Println("Part 2 answer is:")
+	for _, b := range Letters {
+		c := string(b)
+		fmt.Print(answer[c])
+	}
+	fmt.Println()
 }
 
 // Round 0 is really just one round of dancing, i.e. what happens in part 1
@@ -65,7 +95,7 @@ func buildFutureRounds() {
 		d /= 2
 	}
 	fmt.Println("After building future rounds, dances are:")
-	fmt.Println(dances)
+	//fmt.Println(dances)
 }
 
 func part1(instructions []string) {
