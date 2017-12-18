@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"strconv"
+	"sync"
 )
 /*
 snd X snd X sends the value of X to the other program. These values wait in a queue until that program is ready to receive them. Each program has its own message queue, so a program can never receive a message it sent.
@@ -25,18 +26,20 @@ type instruction struct {
 	argOtherRegister string
 }
 
-var lastSound = 0
-var recoveredSound = 0
-var haveRecoveredASound = false
+var chan0to1 chan int
+var chan1to0 chan int
 
-var registers = make(map[string]int)
-
-func snd(inst instruction) {
-	//fmt.Println("Ring!", registers[inst.register])
-	lastSound = registers[inst.register]
+func snd(programNum int, registers map[string]int, inst instruction) {
+	valToSend := registers[inst.register]
+	if programNum == 0 {
+		chan0to1 <- valToSend
+	} else {
+		fmt.Println("Program 1 is sending")
+		chan1to0 <- valToSend
+	}
 }
 
-func set(inst instruction) {
+func set(registers map[string]int, inst instruction) {
 	if inst.argIsOtherRegister {
 		registers[inst.register] = registers[inst.argOtherRegister]
 	} else {
@@ -45,7 +48,7 @@ func set(inst instruction) {
 	//fmt.Println(registers)
 }
 
-func add(inst instruction) {
+func add(registers map[string]int, inst instruction) {
 	if inst.argIsOtherRegister {
 		registers[inst.register] += registers[inst.argOtherRegister]
 	} else {
@@ -53,7 +56,7 @@ func add(inst instruction) {
 	}
 }
 
-func mul(inst instruction) {
+func mul(registers map[string]int, inst instruction) {
 	if inst.argIsOtherRegister {
 		registers[inst.register] *= registers[inst.argOtherRegister]
 	} else {
@@ -61,7 +64,7 @@ func mul(inst instruction) {
 	}
 }
 
-func mod(inst instruction) {
+func mod(registers map[string]int, inst instruction) {
 	if inst.argIsOtherRegister {
 		registers[inst.register] %= registers[inst.argOtherRegister]
 	} else {
@@ -69,17 +72,15 @@ func mod(inst instruction) {
 	}
 }
 
-func rcv(inst instruction) {
-	if registers[inst.register] > 0 {
-		recoveredSound = lastSound
-		if !haveRecoveredASound {
-			haveRecoveredASound = true
-			fmt.Println("Part 1: first recovered sound:", recoveredSound)
-		}
+func rcv(programNum int, registers map[string]int, inst instruction) {
+	if programNum == 0 {
+		registers[inst.register] = <- chan1to0
+	} else {
+		registers[inst.register] = <- chan0to1
 	}
 }
 
-func jgz(inst instruction) int {
+func jgz(registers map[string]int, inst instruction) int {
 	// don't jump if the register value is less than or equal to zero,
 	// just go to the next instruction, i.e "jump" forward 1, as usual
 	if registers[inst.register] <= 0 {
@@ -93,42 +94,54 @@ func jgz(inst instruction) int {
 }
 
 func main() {
+	var wg sync.WaitGroup
+	wg.Add(2)
 	instructions := parseInput(readInput())
-	fmt.Println(instructions)
-	processInstructions(instructions)
+	//fmt.Println(instructions)
+	go func() {
+		defer wg.Done()
+		processInstructions(0, instructions)
+	}()
+	go func() {
+		defer wg.Done()
+		processInstructions(1, instructions)
+	}()
+	wg.Wait()
 }
 
-func processSingleInstruction(inst instruction) int {
+func processSingleInstruction(programNum int, registers map[string]int, inst instruction) int {
 	if inst.name == "jgz" {
-		return jgz(inst)
+		return jgz(registers, inst)
 	}
 	switch inst.name {
 	case "snd": {
-		snd(inst)
+		snd(programNum, registers, inst)
 	}
 	case "set": {
-		set(inst)
+		set(registers, inst)
 	}
 	case "add": {
-		add(inst)
+		add(registers, inst)
 	}
 	case "mul": {
-		mul(inst)
+		mul(registers, inst)
 	}
 	case "mod": {
-		mod(inst)
+		mod(registers, inst)
 	}
 	case "rcv": {
-		rcv(inst)
+		rcv(programNum, registers, inst)
 	}
 	}
 	return 1
 }
 
-func processInstructions(instructions []instruction) {
+func processInstructions(programNum int, instructions []instruction) {
+	var registers = make(map[string]int)
+	registers["p"] = programNum
 	nextInstruction := 0
 	for nextInstruction < len(instructions) {
-		jump := processSingleInstruction(instructions[nextInstruction])
+		jump := processSingleInstruction(programNum, registers, instructions[nextInstruction])
 		//fmt.Println(registers)
 		nextInstruction += jump
 		//fmt.Println("nextInstruction is:", nextInstruction)
