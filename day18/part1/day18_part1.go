@@ -94,7 +94,7 @@ func jgz(inst instruction) int {
 
 func main() {
 	instructions := parseInput(readInput())
-	fmt.Println(instructions)
+	//fmt.Println(instructions)
 	processInstructions(instructions)
 }
 
