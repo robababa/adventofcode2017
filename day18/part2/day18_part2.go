@@ -26,16 +26,20 @@ type instruction struct {
 	argOtherRegister string
 }
 
-var chan0to1 chan int
-var chan1to0 chan int
+var chan0to1 = make(chan int, 200000000)
+var chan1to0 = make(chan int, 200000000)
+// answer with 100 million: 200796820
+// answer with 80 million: 160638020
+//var chan0to1 = make(chan int, 16)
+//var chan1to0 = make(chan int, 16)
 
 func snd(programNum int, registers map[string]int, inst instruction) {
-	valToSend := registers[inst.register]
 	if programNum == 0 {
-		chan0to1 <- valToSend
+		//fmt.Println("Program 0 is sending value", registers[inst.register])
+		chan0to1 <- registers[inst.register]
 	} else {
-		fmt.Println("Program 1 is sending")
-		chan1to0 <- valToSend
+		fmt.Println("P1 send", registers[inst.register])
+		chan1to0 <- registers[inst.register]
 	}
 }
 
@@ -74,9 +78,10 @@ func mod(registers map[string]int, inst instruction) {
 
 func rcv(programNum int, registers map[string]int, inst instruction) {
 	if programNum == 0 {
-		registers[inst.register] = <- chan1to0
+		registers[inst.register] = <-chan1to0
+		//fmt.Println("Program 0 received a value")
 	} else {
-		registers[inst.register] = <- chan0to1
+		registers[inst.register] = <-chan0to1
 	}
 }
 
@@ -140,11 +145,12 @@ func processInstructions(programNum int, instructions []instruction) {
 	var registers = make(map[string]int)
 	registers["p"] = programNum
 	nextInstruction := 0
+	//fmt.Println("Program", programNum, "nextInstruction is:", nextInstruction)
 	for nextInstruction < len(instructions) {
 		jump := processSingleInstruction(programNum, registers, instructions[nextInstruction])
 		//fmt.Println(registers)
 		nextInstruction += jump
-		//fmt.Println("nextInstruction is:", nextInstruction)
+		//fmt.Println("Program", programNum, "nextInstruction is:", nextInstruction)
 	}
 }
 
