@@ -26,14 +26,9 @@ type instruction struct {
 	argOtherRegister string
 }
 
-var chan0to1 = make(chan int, 400000000)
-var chan1to0 = make(chan int, 400000000)
-// answer with 400 million: 803178439
-// answer with 200 million: 401590920
-// answer with 100 million: 200796820
-// answer with 80 million:  160638020
-//var chan0to1 = make(chan int, 16)
-//var chan1to0 = make(chan int, 16)
+var chan0to1 = make(chan int, 100000)
+var chan1to0 = make(chan int, 100000)
+var sends [2]int
 
 func snd(programNum int, registers map[string]int, inst instruction) {
 	if programNum == 0 {
@@ -41,7 +36,6 @@ func snd(programNum int, registers map[string]int, inst instruction) {
 		chan0to1 <- registers[inst.register]
 	} else {
 		//fmt.Println("P1 send", registers[inst.register], "len(channel) was", len(chan1to0))
-		fmt.Println("P1 send")
 		chan1to0 <- registers[inst.register]
 	}
 }
@@ -87,12 +81,17 @@ func rcv(programNum int, registers map[string]int, inst instruction) {
 		registers[inst.register] = <-chan0to1
 		//fmt.Println("P1 received", registers[inst.register], "new length is", len(chan0to1))
 	}
+	//fmt.Println("Channel lengths:", len(chan0to1), len(chan1to0))
 }
 
 func jgz(registers map[string]int, inst instruction) int {
-	// don't jump if the register value is less than or equal to zero,
+	xValue, err := strconv.Atoi(inst.register)
+	if err != nil {
+		xValue = registers[inst.register]
+	}
+	// don't jump if the x value is less than or equal to zero,
 	// just go to the next instruction, i.e "jump" forward 1, as usual
-	if registers[inst.register] <= 0 {
+	if xValue <= 0 {
 		return 1
 	}
 	if inst.argIsOtherRegister {
@@ -125,6 +124,7 @@ func processSingleInstruction(programNum int, registers map[string]int, inst ins
 	switch inst.name {
 	case "snd": {
 		snd(programNum, registers, inst)
+		sends[programNum]++
 	}
 	case "set": {
 		set(registers, inst)
@@ -139,10 +139,25 @@ func processSingleInstruction(programNum int, registers map[string]int, inst ins
 		mod(registers, inst)
 	}
 	case "rcv": {
+		fmt.Println("SENDS:", sends)
 		rcv(programNum, registers, inst)
 	}
 	}
 	return 1
+}
+
+func printInstruction(inst instruction) string {
+	answer := inst.name + " " + inst.register
+	if inst.name == "snd" || inst.name == "rcv" {
+		return answer
+	}
+	var lastArg string
+	if inst.argIsOtherRegister {
+		lastArg = inst.argOtherRegister
+	} else {
+		lastArg = strconv.Itoa(inst.argInt)
+	}
+	return answer + " " + lastArg
 }
 
 func processInstructions(programNum int, instructions []instruction) {
@@ -151,6 +166,7 @@ func processInstructions(programNum int, instructions []instruction) {
 	nextInstruction := 0
 	//fmt.Println("Program", programNum, "nextInstruction is:", nextInstruction)
 	for nextInstruction < len(instructions) {
+		fmt.Println(programNum, ":", printInstruction(instructions[nextInstruction]))
 		jump := processSingleInstruction(programNum, registers, instructions[nextInstruction])
 		//fmt.Println(registers)
 		nextInstruction += jump
