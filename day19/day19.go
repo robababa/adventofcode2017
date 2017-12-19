@@ -23,17 +23,21 @@ func main() {
 	grid := readInput()
 	//fmt.Println("grid:", grid)
 	//fmt.Println("grid[0][5]:", string(grid[0][5]))
-	fmt.Println("Starting column is", findStartingColumn(grid[0]))
+	steps := 0
+	//fmt.Println("Starting column is", findStartingColumn(grid[0]))
 	previousSpot := spot{direction: "DOWN", row: -2, column: findStartingColumn(grid[0])}
 	currentSpot := spot{direction: "DOWN", row: -1, column: findStartingColumn(grid[0])}
 	for currentSpot != previousSpot {
-		fmt.Println("moving...")
+		//fmt.Println("moving...")
 		newSpot := move(grid, currentSpot)
 		previousSpot = currentSpot
 		currentSpot = newSpot
-		fmt.Println("currentSpot is", currentSpot)
+		steps += 1
+		//fmt.Println("currentSpot is", currentSpot)
 	}
-	fmt.Println("The letters are", letters)
+	fmt.Println("Part 1: The letters are", letters)
+	// subtract one from steps because the last step kept us in the same place
+	fmt.Println("Part 2: Number of steps is", steps - 1)
 }
 
 func turn(grid []string, current spot) (spot) {
@@ -76,28 +80,28 @@ func move(grid []string, current spot) (spot) {
 		returnValue = spot{direction: "RIGHT", row: current.row, column: current.column + 1}
 	}
 	}
-	fmt.Println("checking for move off grid...")
+	//fmt.Println("checking for move off grid...")
 	// if we moved off the grid, that's a no-no, so return the original spot
 	if returnValue.row < 0 || returnValue.column < 0 {
 		return current
 	}
 	newGridChar := grid[returnValue.row][returnValue.column]
 	// if the grid is empty in the new spot, we're done, so return the old spot
-	fmt.Println("checking for empty...")
+	//fmt.Println("checking for empty...")
 	if newGridChar == Empty {
 		return current
 	}
 	// if we hit a corner, we need to change direction
-	fmt.Println("checking for corner...")
+	//fmt.Println("checking for corner...")
 	if newGridChar == Corner {
 		returnValue = turn(grid, returnValue)
 	}
-	fmt.Println("checking for letter...")
+	//fmt.Println("checking for letter...")
 	// finally, if we landed on a letter, add it to our letters string
 	if newGridChar >= 'A' && newGridChar <= 'Z' {
 		letters += string(newGridChar)
 	}
-	fmt.Println("returnValue is", returnValue)
+	//fmt.Println("returnValue is", returnValue)
 	return returnValue
 }
 

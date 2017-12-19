@@ -26,19 +26,22 @@ type instruction struct {
 	argOtherRegister string
 }
 
-var chan0to1 = make(chan int, 200000000)
-var chan1to0 = make(chan int, 200000000)
+var chan0to1 = make(chan int, 400000000)
+var chan1to0 = make(chan int, 400000000)
+// answer with 400 million: 803178439
+// answer with 200 million: 401590920
 // answer with 100 million: 200796820
-// answer with 80 million: 160638020
+// answer with 80 million:  160638020
 //var chan0to1 = make(chan int, 16)
 //var chan1to0 = make(chan int, 16)
 
 func snd(programNum int, registers map[string]int, inst instruction) {
 	if programNum == 0 {
-		//fmt.Println("Program 0 is sending value", registers[inst.register])
+		//fmt.Println("P0 send", registers[inst.register], "len(channel) was", len(chan0to1))
 		chan0to1 <- registers[inst.register]
 	} else {
-		fmt.Println("P1 send", registers[inst.register])
+		//fmt.Println("P1 send", registers[inst.register], "len(channel) was", len(chan1to0))
+		fmt.Println("P1 send")
 		chan1to0 <- registers[inst.register]
 	}
 }
@@ -79,9 +82,10 @@ func mod(registers map[string]int, inst instruction) {
 func rcv(programNum int, registers map[string]int, inst instruction) {
 	if programNum == 0 {
 		registers[inst.register] = <-chan1to0
-		//fmt.Println("Program 0 received a value")
+		//fmt.Println("P0 received", registers[inst.register], "new length is", len(chan1to0))
 	} else {
 		registers[inst.register] = <-chan0to1
+		//fmt.Println("P1 received", registers[inst.register], "new length is", len(chan0to1))
 	}
 }
 
