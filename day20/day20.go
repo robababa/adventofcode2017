@@ -14,7 +14,8 @@ type Coordinate struct {
 }
 
 type Particle struct {
-	position,velocity,acceleration Coordinate
+	// p=position, v=velocity, a=acceleration
+	p, v, a Coordinate
 }
 
 func main() {
@@ -45,19 +46,19 @@ func parseCoordinates(s string) Coordinate {
 }
 
 func parseParticle(s string) Particle {
-	var p Particle
+	var pt Particle
 	// s is of the form p=<1199,-2918,1457>, v=<-13,115,-8>, a=<-7,8,-10>
-	// the ", " is the separator between position, velocity and acceleration
+	// the ", " is the separator between p, v and a
 	for i, coordinates := range strings.Split(s, ", ") {
 		// strip off the p=< and > (or v=< and >, or a=< and >)
 		strippedCoordinates := coordinates[3:len(coordinates) - 1]
 		switch i {
-		case 0: p.position = parseCoordinates(strippedCoordinates)
-		case 1: p.velocity = parseCoordinates(strippedCoordinates)
-		case 2: p.acceleration = parseCoordinates(strippedCoordinates)
+		case 0: pt.p = parseCoordinates(strippedCoordinates)
+		case 1: pt.v = parseCoordinates(strippedCoordinates)
+		case 2: pt.a = parseCoordinates(strippedCoordinates)
 		}	
 	}
-	return p
+	return pt
 }
 
 func parseInput(input []string) []Particle {
