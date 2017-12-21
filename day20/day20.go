@@ -11,6 +11,7 @@ import (
 )
 
 const NoSolutionValue = -1
+const AlwaysZero = -2
 
 type Coordinate struct {
 	x,y,z int
@@ -65,12 +66,44 @@ func removeParticles(particles []Particle) {
 	}
 }
 
+// returns the positive integer solution to the equation bx + c = 0, if one exists
+// if it is always true for all positive x, then it returns AlwaysZero
+// if it is true for no positive integers x, then it returns NoSolutionValue
+func linearPositiveIntegerSolutions(b int, c int) (int, int) {
+	switch {
+	// 0 = 0 is always true
+	case b == 0 && c == 0:
+		return AlwaysZero, AlwaysZero
+		// c == 0 is always false when c != 0
+	case b == 0 && c != 0:
+		return NoSolutionValue, NoSolutionValue
+		// bx = 0 for b != 0 is true iff x is 0
+	case b != 0 && c == 0:
+		return 0, NoSolutionValue
+	default: {
+		possibleAnswer := int(-1 * c / b)
+		if possibleAnswer > 0 && b*possibleAnswer+c == 0 {
+			return possibleAnswer, NoSolutionValue
+		} else {
+			return NoSolutionValue, NoSolutionValue
+		}
+	}
+	}
+}
+
 // returns the positive integer solutions to the quadratic equation
 // ax^2 + bx + c = 0
 // if there are two solutions, this function returns both of them
 // if there is only one positive integer solution, it returns that solution and NoSolutionValue
 // if there are no positive integer solutions, the function returns NoSolutionValue, NoSolutionValue
 func quadraticPositiveIntegerSolutions(a int, b int, c int) (int, int) {
+	fmt.Println("Solving quadratic equation", a, "* t^2 +", b, "* t +", c, "= 0")
+	// first, get some edge cases out of the way when a = 0
+	if a == 0 {
+		return linearPositiveIntegerSolutions(b, c)
+	}
+
+	// at this point, we have a real quadratic equation
 	discriminant := b * b - 4 * a * c
 	// imaginary solutions don't work here
 	if discriminant < 0 {
@@ -113,10 +146,18 @@ func quadraticPositiveIntegerSolutions(a int, b int, c int) (int, int) {
 func whenAtOrigin(pcl Particle) (int, int) {
 	// the position along an axis is a*t*(t-1) + v*t + p = a*t^2 + (v - a) * t + p
 	xRoot1, xRoot2 := quadraticPositiveIntegerSolutions(pcl.a.x, pcl.v.x - pcl.a.x, pcl.p.x)
+	fmt.Println("Solutions are", xRoot1, xRoot2)
 	yRoot1, yRoot2 := quadraticPositiveIntegerSolutions(pcl.a.y, pcl.v.y - pcl.a.y, pcl.p.y)
+	fmt.Println("Solutions are", yRoot1, yRoot2)
 	zRoot1, zRoot2 := quadraticPositiveIntegerSolutions(pcl.a.z, pcl.v.z - pcl.a.z, pcl.p.z)
+	fmt.Println("Solutions are", zRoot1, zRoot2)
+
+	if xRoot1 == AlwaysZero && yRoot1 == AlwaysZero && zRoot1 == AlwaysZero {
+		return 0, 1
+	}
 
 	answer1, answer2 := NoSolutionValue, NoSolutionValue
+
 	if xRoot1 > 0 && (xRoot1 == yRoot1 || xRoot1 == yRoot2) && (xRoot1 == zRoot1 || xRoot1 == zRoot2) {
 		answer1 = xRoot1
 	}
@@ -154,7 +195,9 @@ func firstCollide(p1, p2 Particle) int {
 func loadCollisions(particles []Particle) {
 	for i, p := range particles {
 		for j, p2 := range particles[(i+1):] {
+			fmt.Println("Comparing particles", p, "and", p2)
 			collisionRound := firstCollide(p, p2)
+			fmt.Println("  collisionRound is", collisionRound)
 			if collisionRound != NoSolutionValue {
 				collisions[collisionRound] = append(collisions[collisionRound], Collision{i, j})
 				if collisionRound > latestCollisionRound {
