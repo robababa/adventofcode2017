@@ -54,12 +54,12 @@ func flipTopAndBottom(grid []string) []string {
 
 func flipLeftAndRight(grid []string) []string {
 	var answer []string
-	for i := len(grid[0]) -1; i>=0; i-- {
-		var nextLine string
-		for j := 0; j < len(grid[0]); j++ {
-			nextLine += string(grid[i][j])
+	for _, s := range grid {
+		var thisLine string
+		for i := len(s) - 1; i >= 0; i-- {
+			thisLine += string(s[i])
 		}
-		answer = append(answer, nextLine)
+		answer = append(answer, thisLine)
 	}
 	return answer
 }
