@@ -133,20 +133,28 @@ func combineGrids(grids [][]string) []string {
 	if len(grids) == 1 {
 		return grids[0]
 	}
+
 	var answer []string
-	subGridsAcross := int(math.Sqrt(float64(len(grids))))
-	//fmt.Println("in combineGrids(), subGridsAcross is", subGridsAcross)
-	var buildString string
-	for startingGrid := 0; startingGrid < len(grids); startingGrid += subGridsAcross {
-		for j := 0; j < subGridsAcross; j++ {
+	subGridDimension := len(grids[0])
+	gridDimension := int(math.Sqrt(float64(len(grids) * subGridDimension * subGridDimension)))
+	subGridsAcross := gridDimension / subGridDimension
+	subGridsDown := subGridsAcross
+	// 0,0 + 1,0
+	// 0,1 + 1,1
+	// 0,2 + 1,2
+	// 2,0 + 3,0
+	// 2,1 + 3,1
+	// 2,2 + 3,2
+	for subGridGroup := 0; subGridGroup < subGridsDown; subGridGroup++ {
+		subGridStart := subGridGroup * subGridsAcross
+		for j := 0; j < subGridDimension; j++ {
+			var nextRow string
 			for i := 0; i < subGridsAcross; i++ {
-				buildString += grids[startingGrid + i][j]
+				nextRow += grids[subGridStart+i][j]
 			}
-			answer = append(answer, buildString)
-			buildString = ""
+			answer = append(answer, nextRow)
 		}
 	}
-	//fmt.Println("combineGrids() output is", answer)
 	return answer
 }
 
