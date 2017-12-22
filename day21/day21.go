@@ -29,13 +29,19 @@ func main() {
 	//fmt.Println(currentGrid)
 	for round := 1; round <= 5; round++ {
 		currentGrid = enhanceEntireGrid(currentGrid)
-		//fmt.Println("After round", round, "grid is")
-		//fmt.Println(currentGrid)
+		fmt.Println()
+		fmt.Println("After round", round, "grid is:")
+		printGrid(currentGrid)
+		fmt.Println("Number of hashes is", countHashes(currentGrid))
 	}
-	fmt.Println("Final grid is")
-	fmt.Println(currentGrid)
 	// 134 is too low
-	fmt.Println("Number of hashes is", countHashes(currentGrid))
+	//fmt.Println("Number of hashes is", countHashes(currentGrid))
+}
+
+func printGrid(grid []string) {
+	for _, line := range grid {
+		fmt.Println(line)
+	}
 }
 
 func countHashes(lines []string) int {
@@ -123,6 +129,7 @@ func findKey(grid []string) string {
 			}
 		}
 	}
+	fmt.Println("WARNING!! KEY NOT FOUND:", grid)
 	return answer
 }
 
