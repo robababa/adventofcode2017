@@ -64,12 +64,22 @@ func ExampleGridToKey() {
 // --------------
 //  A  B | E  F
 //  C  D | G  H
+//
+// ABC | JKL
+// DEF | MNO
+// GHI | PQR
+// ---------
+// STU | 123
+// VWX | 456
+// YZ0 | 789
 func ExampleCombineGrids() {
 	fmt.Println(combineGrids([][]string{{"12","34"}}))
 	fmt.Println(combineGrids([][]string{{"12","34"},{"56","78"},{"AB","CD"},{"EF","GH"}}))
+	fmt.Println(combineGrids([][]string{{"ABC","DEF","GHI"},{"JKL","MNO","PQR"},{"STU","VWX","YZ0"},{"123","456","789"}}))
 	//Output:
 	//[12 34]
 	//[1256 3478 ABEF CDGH]
+	//[ABCJKL DEFMNO GHIPQR STU123 VWX456 YZ0789]
 }
 
 // 12

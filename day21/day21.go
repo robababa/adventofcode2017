@@ -27,7 +27,7 @@ func main() {
 	currentGrid := InitialGrid
 	fmt.Println("Before enhancement, grid starts as")
 	fmt.Println(currentGrid)
-	for round := 1; round <= 2; round++ {
+	for round := 1; round <= 5; round++ {
 		currentGrid = enhanceEntireGrid(currentGrid)
 		fmt.Println("After round", round, "grid is")
 		fmt.Println(currentGrid)
@@ -128,6 +128,7 @@ func enhanceSubGrid(grid []string) []string {
 }
 
 func combineGrids(grids [][]string) []string {
+	//fmt.Println("combineGrids() input is", grids)
 	// if there is only one grid, return it
 	if len(grids) == 1 {
 		return grids[0]
@@ -145,13 +146,13 @@ func combineGrids(grids [][]string) []string {
 			buildString = ""
 		}
 	}
-	//fmt.Println("in combineGrids(), answer is", answer)
+	//fmt.Println("combineGrids() output is", answer)
 	return answer
 }
 
 func enhanceAllSubGrids(grids [][]string) [][]string {
 	var answer [][]string
-	fmt.Println("enhanceAllSubGrids argument is", grids)
+	//fmt.Println("enhanceAllSubGrids argument is", grids)
 	for _, g := range grids {
 		answer = append(answer, enhanceSubGrid(g))
 	}
