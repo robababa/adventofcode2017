@@ -34,9 +34,19 @@ func main() {
 	}
 	fmt.Println("Final grid is")
 	fmt.Println(currentGrid)
+	// 134 is too low
+	fmt.Println("Number of hashes is", countHashes(currentGrid))
 }
 
-func noop(grid[] string) []string {
+func countHashes(lines []string) int {
+	answer := 0
+	for _, s := range lines {
+		answer += len(strings.Replace(s, ".", "", -1))
+	}
+	return answer
+}
+
+func noop(grid []string) []string {
 	return append(grid)
 }
 
