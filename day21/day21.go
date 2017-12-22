@@ -25,13 +25,15 @@ func main() {
 	//fmt.Println(enhancements)
 	//fmt.Println(enhanceSubGrid(InitialGrid))
 	currentGrid := InitialGrid
-	fmt.Println("Before enhancement, grid starts as")
-	fmt.Println(currentGrid)
+	//fmt.Println("Before enhancement, grid starts as")
+	//fmt.Println(currentGrid)
 	for round := 1; round <= 5; round++ {
 		currentGrid = enhanceEntireGrid(currentGrid)
-		fmt.Println("After round", round, "grid is")
-		fmt.Println(currentGrid)
+		//fmt.Println("After round", round, "grid is")
+		//fmt.Println(currentGrid)
 	}
+	fmt.Println("Final grid is")
+	fmt.Println(currentGrid)
 }
 
 func noop(grid[] string) []string {
@@ -176,6 +178,8 @@ func enhanceAllSubGrids(grids [][]string) [][]string {
 // should return
 // [[12 56] [34 78] [AB EF] [CD GH]]
 func divideGrid(grid []string) [][]string {
+	//fmt.Println()
+	//fmt.Println("divideGrid input is", grid)
 	var subGrids [][]string
 	gridLength := len(grid)
 	// nothing to do if grid size is 2 or 3, just return the original grid inside an array
@@ -187,20 +191,18 @@ func divideGrid(grid []string) [][]string {
 		//fmt.Println("Setting subGridSize to 3")
 		subGridSize = 3
 	}
-	subGridCount := gridLength * gridLength / (subGridSize * subGridSize)
-	for subGridNumber := 0; subGridNumber < subGridCount; subGridNumber++ {
-		//fmt.Println("subGridNumber is", subGridNumber)
-		startingColumn := (subGridSize * subGridNumber) % gridLength
-		//startingRow := (subGridSize * subGridNumber) / gridLength
-		startingRow := subGridSize * (subGridNumber / subGridSize)
-		//fmt.Println("startingRow, subGridSize, subGridNumber, gridLength are", startingRow, subGridSize, subGridNumber, gridLength)
-		var currentSubGrid []string
-		for i := 0; i < subGridSize; i++ {
-			//fmt.Println("appending to currentSubGrid", grid[startingRow + i][startingColumn:startingColumn+subGridSize])
-			currentSubGrid = append(currentSubGrid, grid[startingRow + i][startingColumn:startingColumn+subGridSize])
+
+	gridDimension := len(grid[0])
+	subGridCount := gridDimension * gridDimension / subGridSize	/ subGridSize
+
+	for subGridNum := 0; subGridNum < subGridCount; subGridNum++ {
+		rowStart :=  subGridSize * (subGridNum * subGridSize / gridDimension)
+		columnStart := (subGridNum * subGridSize) % gridDimension
+		var newSubGrid []string
+		for r := 0; r < subGridSize; r++ {
+			newSubGrid = append(newSubGrid, grid[rowStart + r][columnStart:columnStart+subGridSize])
 		}
-		//fmt.Println("appending to subGrids", currentSubGrid)
-		subGrids = append(subGrids, currentSubGrid)
+		subGrids = append(subGrids, newSubGrid)
 	}
 	return subGrids
 }
