@@ -23,7 +23,8 @@ var InitialGrid = []string{".#.", "..#", "###"}
 func main() {
 	parseInput(readInput())
 	//fmt.Println(enhancements)
-	fmt.Println(enhanceSubGrid(InitialGrid))
+	//fmt.Println(enhanceSubGrid(InitialGrid))
+	fmt.Println(enhanceEntireGrid(InitialGrid))
 }
 
 func noop(grid[] string) []string {
@@ -118,25 +119,34 @@ func enhanceSubGrid(grid []string) []string {
 }
 
 func combineGrids(grids [][]string) []string {
+	// if there is only one grid, return it
+	if len(grids) == 1 {
+		return grids[0]
+	}
 	var answer []string
 	subGridsAcross := int(math.Sqrt(float64(len(grids))))
 	//fmt.Println("in combineGrids(), subGridsAcross is", subGridsAcross)
 	var buildString string
-	for j := 0; j < subGridsAcross; j++ {
-		for i := 0; i < subGridsAcross; i++ {
-			buildString += grids[i][j]
+	for startingGrid := 0; startingGrid < len(grids); startingGrid += subGridsAcross {
+		for j := 0; j < subGridsAcross; j++ {
+			for i := 0; i < subGridsAcross; i++ {
+				buildString += grids[startingGrid + i][j]
+			}
+			answer = append(answer, buildString)
+			buildString = ""
 		}
-		answer = append(answer, buildString)
-		buildString = ""
 	}
+	//fmt.Println("in combineGrids(), answer is", answer)
 	return answer
 }
 
 func enhanceAllSubGrids(grids [][]string) [][]string {
 	var answer [][]string
+	fmt.Println("in enhanceAllSubGrids, grids is", grids)
 	for _, g := range grids {
 		answer = append(answer, enhanceSubGrid(g))
 	}
+	fmt.Println("in enhanceAllSubGrids, answer is", answer)
 	return answer
 }
 
