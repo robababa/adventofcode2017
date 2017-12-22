@@ -36,12 +36,12 @@ func ExampleFlipLeftAndRight() {
 // 4 5 6 => 8 5 2
 // 7 8 9 => 9 6 3
 func ExampleRotate() {
-	fmt.Println(rotate([]string{"12","34"}, 1, true))
-	fmt.Println(rotate([]string{"12","34"}, 2, true))
-	fmt.Println(rotate([]string{"12","34"}, 3, true))
-	fmt.Println(rotate([]string{"123","456","789"}, 1, true))
-	fmt.Println(rotate([]string{"123","456","789"}, 2, true))
-	fmt.Println(rotate([]string{"123","456","789"}, 3, true))
+	fmt.Println(rotate([]string{"12","34"}, 1))
+	fmt.Println(rotate([]string{"12","34"}, 2))
+	fmt.Println(rotate([]string{"12","34"}, 3))
+	fmt.Println(rotate([]string{"123","456","789"}, 1))
+	fmt.Println(rotate([]string{"123","456","789"}, 2))
+	fmt.Println(rotate([]string{"123","456","789"}, 3))
 	//Output:
 	//[31 42]
 	//[43 21]

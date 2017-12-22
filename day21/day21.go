@@ -71,18 +71,9 @@ func noop(grid []string) []string {
 	return append(grid)
 }
 
-// rotate the grid clockwise
-func rotate(grid []string, rotations int, initialCall bool) []string {
-	if initialCall {
-		debug("rotate(): arguments are rotations =", rotations, "and grid =", grid)
-	}
-	if rotations < 0 {
-		log.Fatal("Called rotate() with negative rotation count")
-	}
-	if rotations == 0 {
-		// like a no-op, just return the original grid
-		return noop(grid)
-	}
+// if this method was in a package, it would be private and callers would use the rotate() method
+// with rotations = 1 if they really just wanted this method
+func rotateOnce(grid []string) []string {
 	var answer []string
 	// "prime" our array of strings with empty strings
 	for range grid {
@@ -99,7 +90,24 @@ func rotate(grid []string, rotations int, initialCall bool) []string {
 			answer[j] += string(grid[i][j])
 		}
 	}
-	return rotate(answer, rotations - 1, false)
+	return answer
+}
+
+// rotate the grid clockwise
+func rotate(grid []string, rotations int) []string {
+	debug("rotate(): arguments are rotations =", rotations, "and grid =", grid)
+	if rotations < 0 {
+		log.Fatal("Called rotate() with negative rotation count")
+	}
+	if rotations == 0 {
+		// like a no-op, just return the original grid
+		return noop(grid)
+	}
+	answer := append(grid)
+	for i := 0; i < rotations; i++ {
+		answer = rotateOnce(answer)
+	}
+	return answer
 }
 
 func flipTopAndBottom(grid []string) []string {
@@ -138,7 +146,7 @@ func findKey(grid []string) string {
 		// and each way to rotate, including not rotating at all
 		for rotations := 0; rotations < 4; rotations++ {
 			// see if the resulting grid is a key in our enhancement rules mapping
-			answer = gridToKey(rotate(flipper(grid), rotations, true))
+			answer = gridToKey(rotate(flipper(grid), rotations))
 			debug("findKey(): Looking for enhancement key", answer)
 			// and if it is, return key
 			if enhancements[answer] != "" {
