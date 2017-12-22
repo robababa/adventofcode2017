@@ -24,7 +24,14 @@ func main() {
 	parseInput(readInput())
 	//fmt.Println(enhancements)
 	//fmt.Println(enhanceSubGrid(InitialGrid))
-	fmt.Println(enhanceEntireGrid(InitialGrid))
+	currentGrid := InitialGrid
+	fmt.Println("Before enhancement, grid starts as")
+	fmt.Println(currentGrid)
+	for round := 1; round <= 5; round++ {
+		currentGrid = enhanceEntireGrid(currentGrid)
+		fmt.Println("After round", round, "grid is")
+		fmt.Println(currentGrid)
+	}
 }
 
 func noop(grid[] string) []string {
@@ -33,6 +40,7 @@ func noop(grid[] string) []string {
 
 // rotate the grid clockwise
 func rotate(grid []string, rotations int) []string {
+	fmt.Println("rotate arguments are rotations =", rotations, "and grid =", grid)
 	if rotations < 0 {
 		log.Fatal("Called rotate() with negative rotation count")
 	}
@@ -107,11 +115,12 @@ func findKey(grid []string) string {
 }
 
 func enhanceSubGrid(grid []string) []string {
+	//fmt.Println("enhanceSubGrid argument is", grid)
 	var answer []string
 	key := findKey(grid)
-	fmt.Println("Enhancement key is", key)
+	//fmt.Println("Enhancement key is", key)
 	val := enhancements[key]
-	fmt.Println("Enhancement value is", val)
+	//fmt.Println("Enhancement value is", val)
 	for _, str := range strings.Split(val, "/") {
 		answer = append(answer, str)
 	}
@@ -142,15 +151,15 @@ func combineGrids(grids [][]string) []string {
 
 func enhanceAllSubGrids(grids [][]string) [][]string {
 	var answer [][]string
-	fmt.Println("in enhanceAllSubGrids, grids is", grids)
+	fmt.Println("enhanceAllSubGrids argument is", grids)
 	for _, g := range grids {
 		answer = append(answer, enhanceSubGrid(g))
 	}
-	fmt.Println("in enhanceAllSubGrids, answer is", answer)
+	//fmt.Println("in enhanceAllSubGrids, answer is", answer)
 	return answer
 }
 
-func enhanceEntireGrid(grid []string) []string {
+func divideGrid(grid []string) [][]string {
 	var subGrids [][]string
 	subGridSize := 2
 	if len(grid) % 3 == 0 {
@@ -169,7 +178,12 @@ func enhanceEntireGrid(grid []string) []string {
 		subGrids = append(subGrids, currentSubGrid)
 		currentSubGrid = append([]string{})
 	}
-	return combineGrids(enhanceAllSubGrids(subGrids))
+	return subGrids
+}
+
+func enhanceEntireGrid(grid []string) []string {
+	// enhance each subgrid individually, and then combine them for the answer
+	return combineGrids(enhanceAllSubGrids(divideGrid(grid)))
 }
 
 func parseInput(lines []string) {
