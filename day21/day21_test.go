@@ -93,12 +93,21 @@ func ExampleCombineGrids() {
 // 5678
 // ABCD
 // EFGH
+//
+// ABCDEF
+// GHIJKL
+// MNOPQR
+// STUVWX
+// YZ0123
+// 456789
 func ExampleDivideGrid() {
 	fmt.Println(divideGrid([]string{"12","34"}))
 	fmt.Println(divideGrid([]string{"123","456","789"}))
 	fmt.Println(divideGrid([]string{"1234","5678","ABCD","EFGH"}))
+	fmt.Println(divideGrid([]string{"ABCDEF", "GHIJKL", "MNOPQR", "STUVWX", "YZ0123", "456789"}))
 	//Output:
 	//[[12 34]]
 	//[[123 456 789]]
 	//[[12 56] [34 78] [AB EF] [CD GH]]
+	//[[ABC GHI MNO] [DEF JKL PQR] [STU YZ0 456] [VWX 123 789]]
 }
