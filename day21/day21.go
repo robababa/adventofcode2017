@@ -40,7 +40,7 @@ func noop(grid[] string) []string {
 
 // rotate the grid clockwise
 func rotate(grid []string, rotations int) []string {
-	fmt.Println("rotate arguments are rotations =", rotations, "and grid =", grid)
+	//fmt.Println("rotate arguments are rotations =", rotations, "and grid =", grid)
 	if rotations < 0 {
 		log.Fatal("Called rotate() with negative rotation count")
 	}
@@ -161,6 +161,10 @@ func enhanceAllSubGrids(grids [][]string) [][]string {
 
 func divideGrid(grid []string) [][]string {
 	var subGrids [][]string
+	// nothing to do if grid size is 2 or 3
+	if len(grid) == 2 || len(grid) == 3 {
+		return append(subGrids, grid)
+	}
 	subGridSize := 2
 	if len(grid) % 3 == 0 {
 		subGridSize = 3
