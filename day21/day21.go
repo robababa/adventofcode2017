@@ -135,11 +135,11 @@ func findKey(grid []string) string {
 		// and each way to rotate, including not rotating at all
 		for rotations := 0; rotations < 4; rotations++ {
 			// see if the resulting grid is a key in our enhancement rules mapping
-			debug("Looking for key")
 			answer = gridToKey(rotate(flipper(grid), rotations))
+			debug("findKey(): Looking for enhancement key", answer)
 			// and if it is, return key
 			if enhancements[answer] != "" {
-				debug("Found the key! Its value is", answer)
+				debug("findKey(): FOUND enhancement key", answer)
 				return answer
 			}
 		}
@@ -149,12 +149,12 @@ func findKey(grid []string) string {
 }
 
 func enhanceSubGrid(grid []string) []string {
-	debug("enhanceSubGrid argument is", grid)
+	debug("enhanceSubGrid(): argument is", grid)
 	var answer []string
 	key := findKey(grid)
-	debug("Enhancement key is", key)
+	debug("enhanceSubGrid(): Enhancement key is", key)
 	val := enhancements[key]
-	debug("Enhancement value is", val)
+	debug("enhanceSubGrid(): Enhancement value is", val)
 	for _, str := range strings.Split(val, "/") {
 		answer = append(answer, str)
 	}
