@@ -45,10 +45,11 @@ func main() {
 	for round := 1; round <= 5; round++ {
 		currentGrid = enhanceEntireGrid(currentGrid)
 		fmt.Println()
-		fmt.Println("Round", round)
+		fmt.Println("Round", round, "COMPLETE")
 		debug("grid is:")
 		printGrid(currentGrid)
 		fmt.Println("Number of hashes is", countHashes(currentGrid))
+		fmt.Println()
 	}
 	// 134 is too low for round 5
 }
