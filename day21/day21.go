@@ -27,7 +27,7 @@ func main() {
 	currentGrid := InitialGrid
 	fmt.Println("Before enhancement, grid starts as")
 	fmt.Println(currentGrid)
-	for round := 1; round <= 5; round++ {
+	for round := 1; round <= 2; round++ {
 		currentGrid = enhanceEntireGrid(currentGrid)
 		fmt.Println("After round", round, "grid is")
 		fmt.Println(currentGrid)
@@ -159,29 +159,54 @@ func enhanceAllSubGrids(grids [][]string) [][]string {
 	return answer
 }
 
+// example:
+// 1234
+// 5678
+// ABCD
+// EFGH
+// should return
+// [[12 56] [34 78] [AB EF] [CD GH]]
 func divideGrid(grid []string) [][]string {
 	var subGrids [][]string
-	// nothing to do if grid size is 2 or 3
-	if len(grid) == 2 || len(grid) == 3 {
+	gridLength := len(grid)
+	// nothing to do if grid size is 2 or 3, just return the original grid inside an array
+	if gridLength == 2 || gridLength == 3 {
 		return append(subGrids, grid)
 	}
 	subGridSize := 2
-	if len(grid) % 3 == 0 {
+	if gridLength % 3 == 0 {
+		//fmt.Println("Setting subGridSize to 3")
 		subGridSize = 3
 	}
-	// collect all of our subGrids, i.e. the 2x2 or 3x3 grids that compose the entire grid
-	var	currentSubGrid []string
-	for subGridAcross := 0; subGridAcross < len(grid) /subGridSize; subGridAcross++ {
-		startAtColumn := subGridAcross * subGridSize
-		for subGridDown := 0; subGridDown < len(grid) /subGridSize; subGridDown++ {
-			startAtRow := subGridDown * subGridSize
-			for i := 0; i < subGridSize; i++ {
-				currentSubGrid = append(currentSubGrid, grid[startAtRow + i][startAtColumn:startAtColumn+subGridSize])
-			}
+	subGridCount := gridLength * gridLength / (subGridSize * subGridSize)
+	for subGridNumber := 0; subGridNumber < subGridCount; subGridNumber++ {
+		//fmt.Println("subGridNumber is", subGridNumber)
+		startingColumn := (subGridSize * subGridNumber) % gridLength
+		//startingRow := (subGridSize * subGridNumber) / gridLength
+		startingRow := subGridSize * (subGridNumber / subGridSize)
+		//fmt.Println("startingRow, subGridSize, subGridNumber, gridLength are", startingRow, subGridSize, subGridNumber, gridLength)
+		var currentSubGrid []string
+		for i := 0; i < subGridSize; i++ {
+			//fmt.Println("appending to currentSubGrid", grid[startingRow + i][startingColumn:startingColumn+subGridSize])
+			currentSubGrid = append(currentSubGrid, grid[startingRow + i][startingColumn:startingColumn+subGridSize])
 		}
+		//fmt.Println("appending to subGrids", currentSubGrid)
 		subGrids = append(subGrids, currentSubGrid)
-		currentSubGrid = append([]string{})
 	}
+
+	//// collect all of our subGrids, i.e. the 2x2 or 3x3 grids that compose the entire grid
+	//var	currentSubGrid []string
+	//for subGridAcross := 0; subGridAcross < len(grid) /subGridSize; subGridAcross++ {
+	//	startAtColumn := subGridAcross * subGridSize
+	//	for subGridDown := 0; subGridDown < len(grid) /subGridSize; subGridDown++ {
+	//		startAtRow := subGridDown * subGridSize
+	//		for i := 0; i < subGridSize; i++ {
+	//			currentSubGrid = append(currentSubGrid, grid[startAtRow + i][startAtColumn:startAtColumn+subGridSize])
+	//		}
+	//	}
+	//	subGrids = append(subGrids, currentSubGrid)
+	//	currentSubGrid = append([]string{})
+	//}
 	return subGrids
 }
 
