@@ -72,8 +72,10 @@ func noop(grid []string) []string {
 }
 
 // rotate the grid clockwise
-func rotate(grid []string, rotations int) []string {
-	debug("rotate(): arguments are rotations =", rotations, "and grid =", grid)
+func rotate(grid []string, rotations int, initialCall bool) []string {
+	if initialCall {
+		debug("rotate(): arguments are rotations =", rotations, "and grid =", grid)
+	}
 	if rotations < 0 {
 		log.Fatal("Called rotate() with negative rotation count")
 	}
@@ -97,7 +99,7 @@ func rotate(grid []string, rotations int) []string {
 			answer[j] += string(grid[i][j])
 		}
 	}
-	return rotate(answer, rotations - 1)
+	return rotate(answer, rotations - 1, false)
 }
 
 func flipTopAndBottom(grid []string) []string {
@@ -129,17 +131,19 @@ func gridToKey(grid []string) string {
 }
 
 func findKey(grid []string) string {
+	debug("findKey(): argument expressed as key is", gridToKey(grid))
 	var answer string
 	// for each way to flip, including not flipping at all
 	for _, flipper := range []func([]string) []string{noop, flipTopAndBottom, flipLeftAndRight} {
 		// and each way to rotate, including not rotating at all
 		for rotations := 0; rotations < 4; rotations++ {
 			// see if the resulting grid is a key in our enhancement rules mapping
-			answer = gridToKey(rotate(flipper(grid), rotations))
+			answer = gridToKey(rotate(flipper(grid), rotations, true))
 			debug("findKey(): Looking for enhancement key", answer)
 			// and if it is, return key
 			if enhancements[answer] != "" {
 				debug("findKey(): FOUND enhancement key", answer)
+				debug()
 				return answer
 			}
 		}
