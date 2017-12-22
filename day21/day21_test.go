@@ -35,10 +35,26 @@ func ExampleFlipLeftAndRight() {
 // 1 2 3 => 7 4 1
 // 4 5 6 => 8 5 2
 // 7 8 9 => 9 6 3
-func ExampleRotateClockwise() {
-	fmt.Println(rotateClockwise([]string{"12","34"}))
-	fmt.Println(rotateClockwise([]string{"123","456","789"}))
+func ExampleRotate() {
+	fmt.Println(rotate([]string{"12","34"}, 1))
+	fmt.Println(rotate([]string{"12","34"}, 2))
+	fmt.Println(rotate([]string{"12","34"}, 3))
+	fmt.Println(rotate([]string{"123","456","789"}, 1))
+	fmt.Println(rotate([]string{"123","456","789"}, 2))
+	fmt.Println(rotate([]string{"123","456","789"}, 3))
 	//Output:
 	//[31 42]
+	//[43 21]
+	//[24 13]
 	//[741 852 963]
+	//[987 654 321]
+	//[369 258 147]
+}
+
+func ExampleGridToKey() {
+	fmt.Println(gridToKey([]string{"12", "34"}))
+	fmt.Println(gridToKey([]string{"123", "456", "789"}))
+	//Output:
+	//12/34
+	//123/456/789
 }

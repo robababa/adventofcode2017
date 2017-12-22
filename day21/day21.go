@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"os"
 	"strings"
+	"log"
 )
 
 // an enhancement is a mapping like this
@@ -24,7 +25,14 @@ func main() {
 	fmt.Println(enhance(InitialGrid))
 }
 
-func rotateClockwise(grid []string) []string {
+// rotate the grid clockwise
+func rotate(grid []string, rotations int) []string {
+	if rotations < 0 {
+		log.Fatal("Called rotate() with negative rotation count")
+	}
+	if rotations == 0 {
+		return append(grid)
+	}
 	var answer []string
 	// "prime" our array of strings with empty strings
 	for range grid {
@@ -41,7 +49,7 @@ func rotateClockwise(grid []string) []string {
 			answer[j] += string(grid[i][j])
 		}
 	}
-	return answer
+	return rotate(answer, rotations - 1)
 }
 
 func flipTopAndBottom(grid []string) []string {
@@ -60,6 +68,25 @@ func flipLeftAndRight(grid []string) []string {
 			thisLine += string(s[i])
 		}
 		answer = append(answer, thisLine)
+	}
+	return answer
+}
+
+func gridToKey(grid []string) string {
+	var answer string
+	for _, s := range grid {
+		answer += s + "/"
+	}
+	return answer[:len(answer) - 1]
+}
+
+func findKey(grid []string) string {
+	var answer string
+	switch {
+	case enhancements[gridToKey(grid)] != "": return enhancements[gridToKey(grid)]
+	//case enhancements[gridToKey(rotate(grid))] != "": return enhancements[gridToKey(rotate(grid))]
+	//case enhancements[gridToKey(rotate(rotate(grid)))] != "": return enhancements[gridToKey(rotate(rotate(grid)))]
+	//case enhancements[gridToKey(rotate(rotate(rotate(grid))))] != "": return enhancements[gridToKey(rotate(rotate(rotate(grid))))]
 	}
 	return answer
 }
