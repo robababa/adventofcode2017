@@ -58,7 +58,7 @@ func main() {
 	currentGrid := InitialGrid
 	debug("Before enhancement, grid starts as")
 	debug(currentGrid)
-	for round := 1; round <= 5; round++ {
+	for round := 1; round <= 18; round++ {
 		currentGrid = enhanceEntireGrid(currentGrid)
 		fmt.Println()
 		fmt.Println("Round", round, "COMPLETE")
@@ -248,7 +248,7 @@ func divideGrid(grid []string) [][]string {
 		return append(subGrids, grid)
 	}
 	subGridSize := 2
-	if gridLength % 3 == 0 {
+	if gridLength % 2 != 0 {
 		debug("Setting subGridSize to 3")
 		subGridSize = 3
 	}
