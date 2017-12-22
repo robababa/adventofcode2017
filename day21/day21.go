@@ -202,20 +202,6 @@ func divideGrid(grid []string) [][]string {
 		//fmt.Println("appending to subGrids", currentSubGrid)
 		subGrids = append(subGrids, currentSubGrid)
 	}
-
-	//// collect all of our subGrids, i.e. the 2x2 or 3x3 grids that compose the entire grid
-	//var	currentSubGrid []string
-	//for subGridAcross := 0; subGridAcross < len(grid) /subGridSize; subGridAcross++ {
-	//	startAtColumn := subGridAcross * subGridSize
-	//	for subGridDown := 0; subGridDown < len(grid) /subGridSize; subGridDown++ {
-	//		startAtRow := subGridDown * subGridSize
-	//		for i := 0; i < subGridSize; i++ {
-	//			currentSubGrid = append(currentSubGrid, grid[startAtRow + i][startAtColumn:startAtColumn+subGridSize])
-	//		}
-	//	}
-	//	subGrids = append(subGrids, currentSubGrid)
-	//	currentSubGrid = append([]string{})
-	//}
 	return subGrids
 }
 
