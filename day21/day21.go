@@ -92,9 +92,11 @@ func findKey(grid []string) string {
 		// and each way to rotate, including not rotating at all
 		for rotations := 0; rotations < 4; rotations++ {
 			// see if the resulting grid is a key in our enhancement rules mapping
+			//fmt.Println("Looking for key")
 			answer = gridToKey(rotate(flipper(grid), rotations))
 			// and if it is, return key
-			if answer != "" {
+			if enhancements[answer] != "" {
+				//fmt.Println("Found the key! Its value is", answer)
 				return answer
 			}
 		}
@@ -105,7 +107,9 @@ func findKey(grid []string) string {
 func enhance(grid []string) []string {
 	var answer []string
 	key := findKey(grid)
+	fmt.Println("Enhancement key is", key)
 	val := enhancements[key]
+	fmt.Println("Enhancement value is", val)
 	for _, str := range strings.Split(val, "/") {
 		answer = append(answer, str)
 	}
