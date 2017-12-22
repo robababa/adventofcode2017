@@ -25,13 +25,18 @@ func main() {
 	fmt.Println(enhance(InitialGrid))
 }
 
+func noop(grid[] string) []string {
+	return append(grid)
+}
+
 // rotate the grid clockwise
 func rotate(grid []string, rotations int) []string {
 	if rotations < 0 {
 		log.Fatal("Called rotate() with negative rotation count")
 	}
 	if rotations == 0 {
-		return append(grid)
+		// like a no-op, just return the original grid
+		return noop(grid)
 	}
 	var answer []string
 	// "prime" our array of strings with empty strings
@@ -82,20 +87,26 @@ func gridToKey(grid []string) string {
 
 func findKey(grid []string) string {
 	var answer string
-	switch {
-	case enhancements[gridToKey(grid)] != "": return enhancements[gridToKey(grid)]
-	//case enhancements[gridToKey(rotate(grid))] != "": return enhancements[gridToKey(rotate(grid))]
-	//case enhancements[gridToKey(rotate(rotate(grid)))] != "": return enhancements[gridToKey(rotate(rotate(grid)))]
-	//case enhancements[gridToKey(rotate(rotate(rotate(grid))))] != "": return enhancements[gridToKey(rotate(rotate(rotate(grid))))]
+	// for each way to flip, including not flipping at all
+	for _, flipper := range []func([]string) []string{noop, flipTopAndBottom, flipLeftAndRight} {
+		// and each way to rotate, including not rotating at all
+		for rotations := 0; rotations < 4; rotations++ {
+			// see if the resulting grid is a key in our enhancement rules mapping
+			answer = gridToKey(rotate(flipper(grid), rotations))
+			// and if it is, return key
+			if answer != "" {
+				return answer
+			}
+		}
 	}
 	return answer
 }
 
 func enhance(grid []string) []string {
 	var answer []string
-	enhancementKey := grid[0] + "/" + grid[1]
-	enhancementValue := enhancements[enhancementKey]
-	for _, str := range strings.Split(enhancementValue, "/") {
+	key := findKey(grid)
+	val := enhancements[key]
+	for _, str := range strings.Split(val, "/") {
 		answer = append(answer, str)
 	}
 	return answer
