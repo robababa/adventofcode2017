@@ -58,3 +58,14 @@ func ExampleGridToKey() {
 	//12/34
 	//123/456/789
 }
+
+//  1  2 | 5  6
+//  3  4 | 7  8
+// --------------
+//  A  B | E  F
+//  C  D | G  H
+func ExampleCombineGrids() {
+	fmt.Println(combineGrids([][]string{{"12","34"},{"56","78"},{"AB","CD"},{"EF","GH"}}))
+	//Output:
+	//[1256 3478 ABEF CDGH]
+}

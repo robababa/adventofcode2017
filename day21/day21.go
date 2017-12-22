@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"log"
+	"math"
 )
 
 // an enhancement is a mapping like this
@@ -22,7 +23,7 @@ var InitialGrid = []string{".#.", "..#", "###"}
 func main() {
 	parseInput(readInput())
 	//fmt.Println(enhancements)
-	fmt.Println(enhance(InitialGrid))
+	fmt.Println(enhanceSubGrid(InitialGrid))
 }
 
 func noop(grid[] string) []string {
@@ -104,7 +105,7 @@ func findKey(grid []string) string {
 	return answer
 }
 
-func enhance(grid []string) []string {
+func enhanceSubGrid(grid []string) []string {
 	var answer []string
 	key := findKey(grid)
 	fmt.Println("Enhancement key is", key)
@@ -114,6 +115,51 @@ func enhance(grid []string) []string {
 		answer = append(answer, str)
 	}
 	return answer
+}
+
+func combineGrids(grids [][]string) []string {
+	var answer []string
+	subGridsAcross := int(math.Sqrt(float64(len(grids))))
+	//fmt.Println("in combineGrids(), subGridsAcross is", subGridsAcross)
+	var buildString string
+	for j := 0; j < subGridsAcross; j++ {
+		for i := 0; i < subGridsAcross; i++ {
+			buildString += grids[i][j]
+		}
+		answer = append(answer, buildString)
+		buildString = ""
+	}
+	return answer
+}
+
+func enhanceAllSubGrids(grids [][]string) [][]string {
+	var answer [][]string
+	for _, g := range grids {
+		answer = append(answer, enhanceSubGrid(g))
+	}
+	return answer
+}
+
+func enhanceEntireGrid(grid []string) []string {
+	var subGrids [][]string
+	subGridSize := 2
+	if len(grid) % 3 == 0 {
+		subGridSize = 3
+	}
+	// collect all of our subGrids, i.e. the 2x2 or 3x3 grids that compose the entire grid
+	var	currentSubGrid []string
+	for subGridAcross := 0; subGridAcross < len(grid) /subGridSize; subGridAcross++ {
+		startAtColumn := subGridAcross * subGridSize
+		for subGridDown := 0; subGridDown < len(grid) /subGridSize; subGridDown++ {
+			startAtRow := subGridDown * subGridSize
+			for i := 0; i < subGridSize; i++ {
+				currentSubGrid = append(currentSubGrid, grid[startAtRow + i][startAtColumn:startAtColumn+subGridSize])
+			}
+		}
+		subGrids = append(subGrids, currentSubGrid)
+		currentSubGrid = append([]string{})
+	}
+	return combineGrids(enhanceAllSubGrids(subGrids))
 }
 
 func parseInput(lines []string) {
