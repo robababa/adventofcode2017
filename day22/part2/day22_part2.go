@@ -20,6 +20,8 @@ type virus struct {
 
 const Infected = '#'
 const Clean = '.'
+const Weakened = 'W'
+const Flagged = 'F'
 
 func turnLeft(v *virus) {
 	switch v.heading {
@@ -37,6 +39,12 @@ func turnRight(v *virus) {
 	turnLeft(v)
 }
 
+func reverse(v *virus) {
+	// two lefts is a reverse
+	turnLeft(v)
+	turnLeft(v)
+}
+
 func onInfected(v *virus) bool {
 	return grid[v.x][v.y] == Infected
 }
@@ -48,6 +56,14 @@ func infect(v *virus) {
 
 func clean(v *virus) {
 	grid[v.x][v.y] = Clean
+}
+
+func weaken(v *virus) {
+	grid[v.x][v.y] = Weakened
+}
+
+func flag(v *virus) {
+	grid[v.x][v.y] = Flagged
 }
 
 func expandLeft(v *virus) {
@@ -96,16 +112,26 @@ func move(v *virus) {
 func main() {
 	grid = readInput()
 	v := &virus{x: len(grid)/2, y: len(grid)/2, heading: 'U'}
-	for i := 0; i < 10000; i++ {
-		if onInfected(v) {
+	for i := 0; i < 10000000; i++ {
+		switch grid[v.x][v.y] {
+		case Infected: {
 			turnRight(v)
-			clean(v)
-			move(v)
-		} else {
-			turnLeft(v)
-			infect(v)
-			move(v)
+			flag(v)
 		}
+		case Clean: {
+			turnLeft(v)
+			weaken(v)
+		}
+		case Weakened: {
+			// no turn
+			infect(v)
+			}
+		case Flagged: {
+			reverse(v)
+			clean(v)
+		}
+		}
+		move(v)
 		//exec.Command("clear")
 		//printGrid()
 		//fmt.Println("Coordinates and heading:", v.x, v.y, string(v.heading))
