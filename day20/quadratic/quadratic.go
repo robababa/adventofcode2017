@@ -64,7 +64,7 @@ func (_ sometimes) never() bool {
 }
 
 func (_ sometimes) sometimes() bool {
-	return false
+	return true
 }
 
 func (s sometimes) values() []int {
@@ -72,7 +72,10 @@ func (s sometimes) values() []int {
 }
 
 func combineSolutions(solutions ...solution) solution {
-	// check for never
+	// if we have no solutions, return never
+	if len(solutions) == 0 {return never{}}
+
+	// check for never among the solutions
 	for _, sol := range solutions {
 		if sol.never() {return never{}}
 	}
@@ -89,11 +92,13 @@ func combineSolutions(solutions ...solution) solution {
 	// we have work to do. Identify the candidates, sort them, and see if one works
 	var candidates []int
 	for _, sol := range solutions {
-		if sol.sometimes() { candidates = append(candidates, sol.values()...)}
+		if sol.sometimes() {
+			candidates = append(candidates, sol.values()...)
+			}
 	}
 	sort.Ints(candidates)
 
-	CandidateLoop:
+CandidateLoop:
 	for _, c := range candidates {
 		SolutionsLoop:
 		for _, sol := range solutions {
