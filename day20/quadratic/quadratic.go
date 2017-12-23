@@ -1,7 +1,6 @@
 package quadratic
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -86,7 +85,6 @@ func linearPositiveIntegerSolution(b int, c int) solution {
 // if there is only one positive integer solution, it returns that solution and NoSolutionValue
 // if there are no positive integer solutions, the function returns NoSolutionValue, NoSolutionValue
 func quadraticPositiveIntegerSolutions(a int, b int, c int) solution {
-	fmt.Println("Solving quadratic equation", a, "* t^2 +", b, "* t +", c, "= 0")
 	// first, get some edge cases out of the way when a = 0
 	if a == 0 {
 		return linearPositiveIntegerSolution(b, c)
@@ -113,11 +111,11 @@ func quadraticPositiveIntegerSolutions(a int, b int, c int) solution {
 	var reallyWorks []int
 
 	// if the possible solutions don't actually work, set them to NoSolutionValue
-	if a * couldBe[0] * couldBe[0] + b * couldBe[0] + c == 0 {
+	if couldBe[0] >= 0 && a * couldBe[0] * couldBe[0] + b * couldBe[0] + c == 0 {
 		reallyWorks = append(reallyWorks, couldBe[0])
 	}
 
-	if a * couldBe[1] * couldBe[1] + b * couldBe[1] + c == 0 {
+	if couldBe[1] >= 0 && couldBe[1] != couldBe[0] && a * couldBe[1] * couldBe[1] + b * couldBe[1] + c == 0 {
 		reallyWorks = append(reallyWorks, couldBe[1])
 	}
 
