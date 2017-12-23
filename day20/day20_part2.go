@@ -40,10 +40,10 @@ func main() {
 	loadCollisions(particles)
 	removeParticles(particles)
 	fmt.Println("The number of particles remaining is", countRemainingParticles(particles))
-	fmt.Println("Particles are:")
-	fmt.Println(particles)
-	fmt.Println("Collisions are:")
-	fmt.Println(collisions)
+	//fmt.Println("Particles are:")
+	//fmt.Println(particles)
+	//fmt.Println("Collisions are:")
+	//fmt.Println(collisions)
 }
 
 func countRemainingParticles(particles []Particle) int {
@@ -59,11 +59,13 @@ func countRemainingParticles(particles []Particle) int {
 func removeParticles(particles []Particle) {
 	// loop through the collisions each round
 	for i := 0; i <= latestCollisionRound; i++ {
+		fmt.Println("Removing particles in round", i)
 		for _, collision := range collisions[i] {
 			// if both particles either have NEVER been zapped, or are zapped THIS round, then they can
 			// zap each other
-			if (particles[collision.p1num].zappedRound == 0 || particles[collision.p1num].zappedRound == i) &&
-				(particles[collision.p2num].zappedRound == 0 || particles[collision.p2num].zappedRound == i) {
+			if (particles[collision.p1num].zappedRound == NotYet || particles[collision.p1num].zappedRound == i) &&
+				(particles[collision.p2num].zappedRound == NotYet || particles[collision.p2num].zappedRound == i) {
+					fmt.Println("Zapping particles", collision.p1num, "and", collision.p2num)
 				particles[collision.p1num].zappedRound = i
 				particles[collision.p2num].zappedRound = i
 			}
@@ -110,7 +112,8 @@ func loadCollisions(particles []Particle) {
 			// starting point
 			if collisionSolution.Always() {
 				fmt.Println("Round ZERO collision for", p1, p2)
-				collisions[0] = append(collisions[0], Collision{p1num: i, p2num: j})
+				// j = 0 at particle i +  1
+				collisions[0] = append(collisions[0], Collision{p1num: i, p2num: i + 1 + j})
 				if latestCollisionRound == NotYet {
 					latestCollisionRound = 0
 				}
@@ -118,8 +121,9 @@ func loadCollisions(particles []Particle) {
 			// sometimes, so we have a single-valued solution
 			if collisionSolution.Sometimes() {
 				collisionRound := collisionSolution.Values()[0]
-				fmt.Println("Round", collisionRound, "collision for", p1, p2)
-				collisions[collisionRound] = append(collisions[collisionRound], Collision{p1num: i, p2num: j})
+				// j = 0 at particle i +  1
+				fmt.Println("Round", collisionRound, "collision for particles", i, "and", i + 1 + j)
+				collisions[collisionRound] = append(collisions[collisionRound], Collision{p1num: i, p2num: i + 1 + j})
 				if latestCollisionRound < collisionRound {
 					latestCollisionRound = collisionRound
 				}
