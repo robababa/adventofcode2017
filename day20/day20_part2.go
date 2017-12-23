@@ -37,7 +37,7 @@ func main() {
 	fmt.Println("Starting day 20 part 2...")
 	input := readInput()
 	particles := parseInput(input)
-	fmt.Println(particles[0])
+	//fmt.Println(particles[0])
 	loadCollisions(particles)
 	removeParticles(particles)
 	fmt.Println("The number of particles remaining is", countRemainingParticles(particles))
@@ -192,6 +192,7 @@ func firstCollide(p1, p2 Particle) int {
 	}
 }
 
+// loop over all of the pairs of particles to determine their earliest collision, if one even exists
 func loadCollisions(particles []Particle) {
 	for i, p := range particles {
 		for j, p2 := range particles[(i+1):] {
