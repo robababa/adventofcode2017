@@ -2,11 +2,13 @@ package quadratic
 
 import (
 	"math"
+	"sort"
 )
 
 type solution interface {
 	always() bool
 	never() bool
+	sometimes() bool
 	values() []int
 }
 
@@ -18,6 +20,10 @@ func (_ never) always() bool {
 
 func (_ never) never() bool {
 	return true
+}
+
+func (_ never) sometimes() bool {
+	return false
 }
 
 func (_ never) values() []int {
@@ -32,6 +38,10 @@ func (_ always) always() bool {
 }
 
 func (_ always) never() bool {
+	return false
+}
+
+func (_ always) sometimes() bool {
 	return false
 }
 
@@ -53,8 +63,54 @@ func (_ sometimes) never() bool {
 	return false
 }
 
+func (_ sometimes) sometimes() bool {
+	return false
+}
+
 func (s sometimes) values() []int {
 	return s.solutionValues
+}
+
+func combineSolutions(solutions ...solution) solution {
+	// check for never
+	for _, sol := range solutions {
+		if sol.never() {return never{}}
+	}
+	// check for always
+	alwaysForAll := true
+	for _, sol := range solutions {
+		if !sol.always() {
+			alwaysForAll = false
+			break
+		}
+	}
+	if alwaysForAll {return always{}}
+
+	// we have work to do. Identify the candidates, sort them, and see if one works
+	var candidates []int
+	for _, sol := range solutions {
+		if sol.sometimes() { candidates = append(candidates, sol.values()...)}
+	}
+	sort.Ints(candidates)
+
+	CandidateLoop:
+	for _, c := range candidates {
+		SolutionsLoop:
+		for _, sol := range solutions {
+			// if this solution is valid for all positive integers, then great, go to the next solution!
+			if sol.always() {continue SolutionsLoop}
+			for _, val := range sol.values() {
+				// if the candidate is a value in the solution, then great, go to the next solution!
+				if val == c {continue SolutionsLoop}
+			}
+			// didn't find the candidate in this solution, go to the next candidate
+			continue CandidateLoop
+		}
+		// this candidate worked for all solutions, so it is the lowest positive integer that works.  Return it!
+		return sometimes{solutionValues: []int{c}}
+	}
+	// no candidates worked
+	return never{}
 }
 
 // returns the positive integer solution to the equation bx + c = 0, if one exists
