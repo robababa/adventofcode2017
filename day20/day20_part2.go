@@ -84,14 +84,18 @@ func netParticle(p1, p2 Particle) Particle {
 
 func positionFormula(pt Particle, dimension string) (int, int, int) {
 	// the position of the particle is given by the function
-	// (a)(t)(t-1) + (v)(t) + p or
-	// (a)(t)(t) + (v - a)(t) + p
+	// (a)(t)(t+1)/2 + (v)(t) + p
+	// we can multiply this whole expression by 2, and the roots will be the same,
+	// and all we care about is the roots.  When we do that, we get
+	// (a)(t)(t + 1) + (2)(v)(t) + (2)(p)
+	// or
+	// a*t*t + [2v + a]*t + 2p
 	switch dimension {
-	case "x": {return pt.a.x, pt.v.x - pt.a.x, pt.p.x}
-	case "y": {return pt.a.y, pt.v.y - pt.a.y, pt.p.y}
-	case "z": {return pt.a.z, pt.v.z - pt.a.z, pt.p.z}
+	case "x": {return pt.a.x, 2 * pt.v.x + pt.a.x, 2 * pt.p.x}
+	case "y": {return pt.a.y, 2 * pt.v.y + pt.a.y, 2 * pt.p.y}
+	case "z": {return pt.a.z, 2 * pt.v.z + pt.a.z, 2 * pt.p.z}
 	// stupid default, but I need to return something
-	default: {return pt.a.z, pt.v.z - pt.a.z, pt.p.z}
+	default: {return pt.a.z, 2 * pt.v.z + pt.a.z, 2 * pt.p.z}
 	}
 }
 
