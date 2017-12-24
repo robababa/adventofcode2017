@@ -70,11 +70,11 @@ func jnz(registers map[string]int, inst instruction) int {
 func main() {
 	instructions := parseInput(readInput())
 	//fmt.Println(instructions)
-	processInstructions(0, instructions)
+	processInstructions(instructions)
 	fmt.Println("Part 1: mul calls is", mulCalls)
 }
 
-func processSingleInstruction(programNum int, registers map[string]int, inst instruction) int {
+func processSingleInstruction(registers map[string]int, inst instruction) int {
 	if inst.name == "jnz" {
 		return jnz(registers, inst)
 	}
@@ -106,14 +106,13 @@ func printInstruction(inst instruction) string {
 	return answer + " " + lastArg
 }
 
-func processInstructions(programNum int, instructions []instruction) {
+func processInstructions(instructions []instruction) {
 	var registers = make(map[string]int)
-	registers["p"] = programNum
 	nextInstruction := 0
-	//fmt.Println("Program", programNum, "nextInstruction is:", nextInstruction)
+	//fmt.Println("nextInstruction is:", nextInstruction)
 	for nextInstruction < len(instructions) {
-		fmt.Println(programNum, ":", printInstruction(instructions[nextInstruction]))
-		jump := processSingleInstruction(programNum, registers, instructions[nextInstruction])
+		fmt.Println(printInstruction(instructions[nextInstruction]))
+		jump := processSingleInstruction(registers, instructions[nextInstruction])
 		//fmt.Println(registers)
 		nextInstruction += jump
 		//fmt.Println("Program", programNum, "nextInstruction is:", nextInstruction)
