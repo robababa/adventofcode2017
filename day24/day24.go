@@ -55,6 +55,7 @@ func matchingBeam(bridge []beam, nextBeam beam) (beam, bool) {
 }
 
 func buildStrongest(stockpile []beamStock, bridge []beam) {
+	//fmt.Println("starting with bridge", bridge)
 	for i, b := range stockpile {
 		// if this next beam hasn't been used already
 		if b.available {
@@ -62,15 +63,18 @@ func buildStrongest(stockpile []beamStock, bridge []beam) {
 			if nextBeam, fits := matchingBeam(bridge, b.piece); fits {
 				// extend the bridge with this beam, mark it unavailable in the stockpile, and recursively
 				// call this function again
-				updatedStockpile := append(stockpile)
+				var updatedStockpile []beamStock
+				updatedStockpile = append(updatedStockpile, stockpile...)
 				updatedStockpile[i].available = false
+				//fmt.Println("comparing stockpile and updatedStockpile", stockpile[i].available, updatedStockpile[i].available)
+				//fmt.Println("New bridge is", append(bridge, nextBeam))
 				buildStrongest(updatedStockpile, append(bridge, nextBeam))
 			}
 		}
 	}
 	if bridgeStrength := strength(bridge); bridgeStrength > strongestBridge.strength {
-		strongestBridge = bridgeAndStrength{bridge: bridge, strength: bridgeStrength}
-		fmt.Println("Strongest bridge now is:", strongestBridge)
+		strongestBridge = bridgeAndStrength{bridge: append(bridge), strength: bridgeStrength}
+		//fmt.Println("Strongest bridge now is:", strongestBridge)
 	}
 }
 
