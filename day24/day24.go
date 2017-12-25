@@ -58,7 +58,10 @@ func buildStrongest(stockpile []beamStock, bridge []beam) {
 	for i, b := range stockpile {
 		// if this next beam hasn't been used already
 		if b.available {
+			// and it fits
 			if nextBeam, fits := matchingBeam(bridge, b.piece); fits {
+				// extend the bridge with this beam, mark it unavailable in the stockpile, and recursively
+				// call this function again
 				updatedStockpile := append(stockpile)
 				updatedStockpile[i].available = false
 				buildStrongest(updatedStockpile, append(bridge, nextBeam))
