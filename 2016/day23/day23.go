@@ -26,6 +26,10 @@ var instructions []instruction
 var registers = make(map [string]int)
 
 func cpy(arg1, arg2 argument) {
+	// guard against invalid instruction caused by toggle
+	if arg2.isValue {
+		return
+	}
 	if arg1.isValue {
 		registers[arg2.variable] = arg1.value
 	} else {
@@ -34,44 +38,65 @@ func cpy(arg1, arg2 argument) {
 }
 
 func inc(arg1 argument) {
+	// guard against invalid instruction caused by toggle
+	if arg1.isValue {
+		return
+	}
 	registers[arg1.variable]++
 }
 
 func dec(arg1 argument) {
+	// guard against invalid instruction caused by toggle
+	if arg1.isValue {
+		return
+	}
 	registers[arg1.variable]--
 }
 
 func jnz(arg1, arg2 argument) int {
-	if arg1.isValue && arg1.value != 0 {
+	switch {
+	case arg1.isValue && arg1.value == 0: {
+		return 1
+		}
+	case !arg1.isValue && registers[arg1.variable] == 0: {
+		return 1
+		}
+	case arg2.isValue: {
 		return arg2.value
 	}
-	firstValue := registers[arg1.variable]
-	if firstValue != 0 {
-		return arg2.value
+	default: {
+		return registers[arg2.variable]
 	}
-	return 1
+	}
 }
 
-//func tgl() {
-//
-//}
+func tgl(instructionNumber int, arg1 argument) {
+	toggleTarget := 0
+	if arg1.isValue {
+		toggleTarget = instructionNumber + arg1.value
+	} else {
+		toggleTarget = instructionNumber + registers[arg1.variable]
+	}
+	// if our toggle goes outside the list of instructions, then return
+	if toggleTarget < 0 || toggleTarget >= len(instructions) {
+		return
+	}
+	oldInstruction := instructions[toggleTarget].command
+	switch oldInstruction {
+	case "inc": {instructions[toggleTarget].command = "dec"}
+	case "dec": {instructions[toggleTarget].command = "inc"}
+	case "tgl": {instructions[toggleTarget].command = "inc"}
+	case "jnz": {instructions[toggleTarget].command = "cpy"}
+	case "cpy": {instructions[toggleTarget].command = "jnz"}
+	}
+}
 
 func main() {
 	parseInput(readInput())
-	fmt.Println("Instructions are:", instructions)
+	//fmt.Println("Instructions are:", instructions)
+	registers["a"] = 7
 	processInstructions()
-	fmt.Println("Part 1: Value in register a:", registers["a"])
-	initPart2()
-	processInstructions()
-	fmt.Println("Part 2: Value in register a:", registers["a"])
-
-}
-
-func initPart2() {
-	registers["a"] = 0
-	registers["b"] = 0
-	registers["c"] = 1
-	registers["d"] = 0
+	fmt.Println("Part 1: Value of a:", registers["a"])
 }
 
 func processInstructions() {
@@ -94,6 +119,13 @@ func processInstructions() {
 		case "jnz": {
 			instructionNumber = instructionNumber + jnz(thisInstruction.arg1, thisInstruction.arg2)
 		}
+		case "tgl": {
+			tgl(instructionNumber, thisInstruction.arg1)
+			instructionNumber++
+		}
+		//fmt.Println("registers are", registers)
+		//fmt.Println("instructions are", instructions)
+		//fmt.Println("instructionNumber is", instructionNumber)
 		}
 	}
 }
