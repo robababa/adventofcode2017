@@ -94,9 +94,9 @@ func tgl(instructionNumber int, arg1 argument) {
 func main() {
 	parseInput(readInput())
 	//fmt.Println("Instructions are:", instructions)
-	registers["a"] = 7
+	registers["a"] = 12
 	processInstructions()
-	fmt.Println("Part 1: Value of a:", registers["a"])
+	fmt.Println("Part 2: Value of a:", registers["a"])
 }
 
 func processInstructions() {
