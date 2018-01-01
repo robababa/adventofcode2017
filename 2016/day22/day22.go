@@ -28,7 +28,7 @@ func main() {
 	fmt.Println(readInput())
 }
 
-func transformLine(s string) string {
+func transformLine(s string) []string {
 	// each line is of the form
 	// /dev/grid/node-x1-y10    90T   71T    19T   78%
 	// we want to
@@ -45,7 +45,7 @@ func transformLine(s string) string {
 				"y", "", 1),
 			"T", "", -1),
 		"-", " ", 1)
-	return strings.Join(strings.Fields(almost), " ")
+	return strings.Fields(almost)
 }
 
 //func parseInput(lines []string) {
