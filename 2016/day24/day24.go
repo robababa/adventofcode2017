@@ -46,6 +46,8 @@ var shortestOneWays = make(map[digitPair]int)
 
 var allDigits = make(map[int]bool)
 
+var permutations [][]int
+
 func main() {
 	lines := readInput()
 	buildGrid(lines)
@@ -55,26 +57,31 @@ func main() {
 		round++
 	}
 	fmt.Println(shortestOneWays)
-	fmt.Println(allDigitsExceptZero())
+	//fmt.Println(allDigitsExceptZero())
 	fmt.Println(digitPermutations(allDigitsExceptZero()))
 }
 
 func digitPermutations(digits []int) [][]int {
-	if len(digits) {return [][]int{}}
-	fmt.Println("digitPermutations() called with", digits)
+	//fmt.Println("digitPermutations() called with", digits)
+	if len(digits) == 1 {
+		return [][]int{{digits[0]}}
+	}
+
 	// an inner function that we use to build up the permutations
-	var combine func(n int, slices [][]int) [][]int
-	combine = func(n int, slices [][]int) [][]int {
+	var combine func(n int, partials [][]int) [][]int
+	combine = func(n int, partials [][]int) [][]int {
 		var combineAnswer [][]int
-		for _, slice := range slices {
-			combineAnswer = append(combineAnswer, append([]int{n}, slice...))
+		for _, partial := range partials {
+			combineAnswer = append(combineAnswer, append([]int{n}, partial...))
 		}
 		return combineAnswer
 	}
 
 	var answer [][]int
 	for i, d := range digits {
-		answer = append(answer, combine(d, digitPermutations(append(digits[:i], digits[i+1:]...)))...)
+		//fmt.Println("digitPermutations() range index and digit", i, "and", d, "from digits", digits)
+		answer = append(answer, combine(d, digitPermutations(append(append([]int{}, digits[:i]...), digits[i+1:]...)))...)
+		//fmt.Println("digitPermutations() answer is", answer)
 	}
 	return answer
 }
