@@ -56,9 +56,32 @@ func main() {
 		extendPaths(round)
 		round++
 	}
-	fmt.Println(shortestOneWays)
+	//fmt.Println("Shortest one-way distances:", shortestOneWays)
 	//fmt.Println(allDigitsExceptZero())
-	fmt.Println(digitPermutations(allDigitsExceptZero()))
+	parts1and2(1)
+}
+
+func parts1and2(part int) {
+	var bestOrder []int
+	bestOrderDistance := -1
+	//fmt.Println(digitPermutations(allDigitsExceptZero()))
+	for _, permutation := range digitPermutations(allDigitsExceptZero()) {
+		firstDigit := 0
+		distance := 0
+		for _, digit := range permutation {
+			if firstDigit < digit {
+				distance+= shortestOneWays[digitPair{lower: firstDigit, higher: digit}]
+			} else {
+				distance+= shortestOneWays[digitPair{lower: digit, higher: firstDigit}]
+			}
+			firstDigit = digit
+		}
+		if bestOrderDistance == -1 || distance < bestOrderDistance {
+			bestOrder = append([]int{0}, permutation...)
+			bestOrderDistance = distance
+		}
+	}
+	fmt.Println("Part", part, ": Best ordering is", bestOrder, "with distance", bestOrderDistance)
 }
 
 func digitPermutations(digits []int) [][]int {
