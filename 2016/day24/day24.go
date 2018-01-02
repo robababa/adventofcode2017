@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 	"log"
-	"testing"
+	"fmt"
 )
 
 type coordinate struct {
@@ -24,6 +24,7 @@ var grid = make(map[coordinate]pathData)
 
 const WALL = '#'
 const OPEN = '.'
+const PhonyDistance = -1
 
 // two different digits.  Store the lower-numbered digit in lower, the higher-numbered one in higher
 type digitPair struct {
@@ -38,6 +39,8 @@ type outpost struct {
 
 var outposts = make(map[outpost]bool)
 
+var outpostsToAdd = make(map[outpost]bool)
+
 // the shortest one-way trips between two digits
 var shortestOneWays = make(map[digitPair]int)
 
@@ -46,11 +49,12 @@ var allDigits = make(map[int]bool)
 func main() {
 	lines := readInput()
 	buildGrid(lines)
-	round := 0
+	round := 1
 	for !doneWithPaths() {
 		extendPaths(round)
 		round++
 	}
+	fmt.Println(shortestOneWays)
 }
 
 // only return true if all pair-wise shortest paths have been found
@@ -83,15 +87,18 @@ func markNewOneWays(round int, digit int, spot coordinate) {
 		}
 		// at this point, we should make the connection!
 		pathLengthFromKey := value
-		// adjust for the -1 dummy value
-		if pathLengthFromKey == -1 {pathLengthFromKey = 0}
+		// adjust for the phony distance value if necessary
+		if pathLengthFromKey == PhonyDistance {pathLengthFromKey = 0}
 		// and make the link
+		//fmt.Println("Linking", lowestDigit, "to", highestDigit, "at coordinate", spot,
+		//	"on digit", digit, "'s turn in round", round, "with distance", round + pathLengthFromKey)
 		shortestOneWays[digitPair{lower: lowestDigit, higher: highestDigit}] = round + pathLengthFromKey
 	}
 }
 
 func tryNewOutpost(round int, possibility outpost) {
-	possibleSpot := coordinate{x: possibility.spot.x, y: possibility.spot.y}
+	//fmt.Println("tryNewOutpost() round", round, "digit", possibility.digit, "at", possibility.spot)
+	possibleSpot := possibility.spot
 	// if this part of the grid is not passable, bail
 	if !grid[possibleSpot].passable {
 		return
@@ -100,19 +107,32 @@ func tryNewOutpost(round int, possibility outpost) {
 	if grid[possibleSpot].bestPaths[possibility.digit] != 0 {
 		return
 	}
-	// so this is a good new outpost.  Add it!
-	outposts[possibility] = true
+	//fmt.Println("...creating outpost")
+	// so this is a good new outpost.  Add it! (to the lists of outposts to add)
+	outpostsToAdd[possibility] = true
 	// and mark the distance for this digit
 	grid[possibleSpot].bestPaths[possibility.digit] = round
 	// make new connections to other digits if we can
 	markNewOneWays(round, possibility.digit, possibleSpot)
 }
 
-func removeOutposts(deleteList map[outpost]bool) {
+func removeOldOutposts(deleteList map[outpost]bool) {
 	for key := range deleteList {
+		//fmt.Println("removeOutposts() deleting outpost", key)
 		delete(outposts, key)
 	}
 }
+
+func addNewOutposts() {
+	for key := range outpostsToAdd {
+		//fmt.Println("addNewOutposts() adding outpost", key)
+		outposts[key] = true
+	}
+	for key := range outpostsToAdd {
+		delete(outpostsToAdd, key)
+	}
+}
+
 
 func extendPaths(round int) {
 	outpostsToRemove := make(map[outpost]bool)
@@ -125,7 +145,9 @@ func extendPaths(round int) {
 		outpostsToRemove[key] = true
 	}
 	// now remove the old outposts
-	removeOutposts(outpostsToRemove)
+	removeOldOutposts(outpostsToRemove)
+	// and add the new ones
+	addNewOutposts()
 }
 
 func buildRow(rowNumber int, row string) {
@@ -145,7 +167,8 @@ func buildRow(rowNumber int, row string) {
 			digit := Atoi(string(ch))
 			allDigits[digit] = true
 			grid[coord] = pathData{passable: true, bestPaths: make(shortestPaths)}
-			grid[coord].bestPaths[digit] = -1
+			grid[coord].bestPaths[digit] = PhonyDistance
+			//fmt.Println("buildRow() creating outpost", outpost{digit: digit, spot: coord})
 			outposts[outpost{digit: digit, spot: coord}] = true
 		}
 		}
