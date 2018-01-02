@@ -59,6 +59,7 @@ func main() {
 	//fmt.Println("Shortest one-way distances:", shortestOneWays)
 	//fmt.Println(allDigitsExceptZero())
 	parts1and2(1)
+	parts1and2(2)
 }
 
 func parts1and2(part int) {
@@ -75,6 +76,10 @@ func parts1and2(part int) {
 				distance+= shortestOneWays[digitPair{lower: digit, higher: firstDigit}]
 			}
 			firstDigit = digit
+		}
+		// in part 2, add the trip back to 0
+		if part == 2 {
+			distance += shortestOneWays[digitPair{lower: 0, higher: permutation[len(permutation) - 1]}]
 		}
 		if bestOrderDistance == -1 || distance < bestOrderDistance {
 			bestOrder = append([]int{0}, permutation...)
