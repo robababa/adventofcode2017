@@ -55,6 +55,38 @@ func main() {
 		round++
 	}
 	fmt.Println(shortestOneWays)
+	fmt.Println(allDigitsExceptZero())
+	fmt.Println(digitPermutations(allDigitsExceptZero()))
+}
+
+func digitPermutations(digits []int) [][]int {
+	if len(digits) {return [][]int{}}
+	fmt.Println("digitPermutations() called with", digits)
+	// an inner function that we use to build up the permutations
+	var combine func(n int, slices [][]int) [][]int
+	combine = func(n int, slices [][]int) [][]int {
+		var combineAnswer [][]int
+		for _, slice := range slices {
+			combineAnswer = append(combineAnswer, append([]int{n}, slice...))
+		}
+		return combineAnswer
+	}
+
+	var answer [][]int
+	for i, d := range digits {
+		answer = append(answer, combine(d, digitPermutations(append(digits[:i], digits[i+1:]...)))...)
+	}
+	return answer
+}
+
+func allDigitsExceptZero() []int {
+	var answer []int
+	for key := range allDigits {
+		if key != 0 {
+			answer = append(answer, key)
+		}
+	}
+	return answer
 }
 
 // only return true if all pair-wise shortest paths have been found
