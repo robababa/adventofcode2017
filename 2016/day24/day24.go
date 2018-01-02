@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"log"
+	"testing"
 )
 
 type coordinate struct {
@@ -67,16 +68,44 @@ func doneWithPaths() bool {
 	return true
 }
 
+func markNewOneWays(round int, digit int, spot coordinate) {
+	for key, value := range grid[spot].bestPaths {
+		// skip over the digit we are working with
+		if key == digit {continue}
+		// the key and the digit are different.
+		lowestDigit, highestDigit := digit, key
+		if lowestDigit > highestDigit {
+			lowestDigit, highestDigit = highestDigit, lowestDigit
+		}
+		// if the connection has already been made, then skip to the next bestPath
+		if shortestOneWays[digitPair{lower: lowestDigit, higher: highestDigit}] != 0 {
+			continue
+		}
+		// at this point, we should make the connection!
+		pathLengthFromKey := value
+		// adjust for the -1 dummy value
+		if pathLengthFromKey == -1 {pathLengthFromKey = 0}
+		// and make the link
+		shortestOneWays[digitPair{lower: lowestDigit, higher: highestDigit}] = round + pathLengthFromKey
+	}
+}
+
 func tryNewOutpost(round int, possibility outpost) {
-	spotOnGrid := grid[coordinate{x: possibility.spot.x, y: possibility.spot.y}]
+	possibleSpot := coordinate{x: possibility.spot.x, y: possibility.spot.y}
 	// if this part of the grid is not passable, bail
-	if !spotOnGrid.passable {
+	if !grid[possibleSpot].passable {
 		return
 	}
 	// if the digit has already visited this part of the grid, bail
-	if spotOnGrid.bestPaths[possibility.digit] != 0 {
+	if grid[possibleSpot].bestPaths[possibility.digit] != 0 {
 		return
 	}
+	// so this is a good new outpost.  Add it!
+	outposts[possibility] = true
+	// and mark the distance for this digit
+	grid[possibleSpot].bestPaths[possibility.digit] = round
+	// make new connections to other digits if we can
+	markNewOneWays(round, possibility.digit, possibleSpot)
 }
 
 func removeOutposts(deleteList map[outpost]bool) {
@@ -116,7 +145,7 @@ func buildRow(rowNumber int, row string) {
 			digit := Atoi(string(ch))
 			allDigits[digit] = true
 			grid[coord] = pathData{passable: true, bestPaths: make(shortestPaths)}
-			grid[coord].bestPaths[digit] = 0
+			grid[coord].bestPaths[digit] = -1
 			outposts[outpost{digit: digit, spot: coord}] = true
 		}
 		}
